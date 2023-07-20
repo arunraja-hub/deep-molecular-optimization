@@ -19,6 +19,7 @@
 #SBATCH --output=/vols/opig/users/raja/slurm_outs/slurm_%j.out  # Writes standard output to this file. %j is jobnumber                             
 #SBATCH --error=/vols/opig/users/raja/slurm_outs/slurm_%j.err   # Writes error messages to this file. %j is jobnumber
 echo $CUDA_VISIBLE_DEVICES 
+echo $CONDA_DEFAULT_ENV
 for dir in */; do
   echo "$dir"
 done
