@@ -17,8 +17,8 @@
 #SBATCH --clusters=srf_gpu_01
 #SBATCH --partition=high-opig-test
 #SBATCH -w nagagpu04.cpu.stats.ox.ac.uk
-#S BATCH --output=/vols/opig/users/raja/slurm_outs/slurm_%j.out                             
-#S BATCH --error=/vols/opig/users/raja/slurm_outs/slurm_%j.err
+#SBATCH --output=/vols/opig/users/raja/molopt_slurm/slurm_%j.out                             
+#SBATCH --error=/vols/opig/users/raja/molopt_slurm/slurm_%j.err
 
 echo $CUDA_VISIBLE_DEVICES 
 echo $CONDA_DEFAULT_ENV
