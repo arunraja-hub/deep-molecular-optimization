@@ -26,5 +26,6 @@ done
 #python -m venv gin7
 #source gin7/bin/activate
 source activate molopt
+echo $CONDA_DEFAULT_ENV
 echo "training"
 python train.py --data-path data/chembl_02 --save-directory train_transformer --model-choice transformer --num-epoch 1 transformer
