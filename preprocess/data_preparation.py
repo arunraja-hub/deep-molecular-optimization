@@ -76,3 +76,5 @@ def prop_change(source, target, threshold):
         return "no_change"
     elif source > threshold and target > threshold:
         return "no_change"
+
+    #after data_prep mmp_prop_encoded is the result
