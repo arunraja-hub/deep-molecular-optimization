@@ -1,9 +1,9 @@
 #!/bin/bash   
-#SBATCH -J e3fp10                     # Job name
+#SBATCH -J molopt                     # Job name
 #SBATCH --time=48:00:00                 # Walltime                                      
 #SBATCH --mem-per-cpu=16G             # memory/cpu (in MB) ### commented out              
 #SBATCH --ntasks=1                      # 1 tasks                                               
-#SBATCH --cpus-per-task=1           # number of cores per task                          
+#S BATCH --cpus-per-task=1           # number of cores per task                          
 #SBATCH --gpus-per-task=1           # number of cores per task                          
 #SBATCH --nodes=1                       # number of nodes                                       
 #S BATCH --exclusive                     # node should not be shared with other jobs, only use this if you intend the node to be usable only by you as this will block other users from submitting jobs     to the same node                
