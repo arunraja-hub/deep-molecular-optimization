@@ -1,7 +1,7 @@
 #!/bin/bash   
 #SBATCH -J molopt                     # Job name
 #SBATCH --time=48:00:00                 # Walltime                                      
-#SBATCH --mem-per-cpu=16G             # memory/cpu (in MB) ### commented out              
+#S BATCH --mem-per-cpu=16G             # memory/cpu (in MB) ### commented out              
 #SBATCH --ntasks=1                      # 1 tasks                                               
 #S BATCH --cpus-per-task=1           # number of cores per task                          
 #SBATCH --gpus-per-task=1           # number of cores per task                          
@@ -12,9 +12,9 @@
 #SBATCH --mail-type=ALL                 # Spam us with everything, caution
 #SBATCH --mail-type=begin               # Instead only email when job begins...
 #SBATCH --mail-type=end                 # ... and ends
-#S BATCH --partition=nagagpu04-high-debug  # Select a specific partition rather than default 
+#SBATCH --partition=nagagpu04-high-debug  # Select a specific partition rather than default 
 #SBATCH --clusters=all
-#S BATCH --partition=high-opig-test    # Select a specific partition rather than default
+#SBATCH --partition=high-opig-test    # Select a specific partition rather than default
 #S BATCH -w nagagpu04.cpu.stats.ox.ac.uk # Provide a specific node/nodelist rather than the standard nodelist associated with the partition (useful if you have a data setup on one specific node)
 #SBATCH --output=/vols/opig/users/raja/slurm_outs/slurm_%j.out  # Writes standard output to this file. %j is jobnumber                             
 #SBATCH --error=/vols/opig/users/raja/slurm_outs/slurm_%j.err   # Writes error messages to this file. %j is jobnumber
