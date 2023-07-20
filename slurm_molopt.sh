@@ -1,13 +1,13 @@
 #!/bin/bash   
 #SBATCH -J molopt                     # Job name
 #SBATCH --time=48:00:00                 # Walltime                                      
-#S BATCH --mem-per-cpu=16G             # memory/cpu (in MB) ### commented out              
+#SBATCH --mem-per-cpu=12000            # memory/cpu (in MB) ### commented out              
 #SBATCH --ntasks=1                      # 1 tasks                                               
-#S BATCH --cpus-per-task=1           # number of cores per task                          
+#SBATCH --cpus-per-task=1           # number of cores per task                          
 #SBATCH --gpus-per-task=1           # number of cores per task                          
 #SBATCH --nodes=1                       # number of nodes                                       
 #S BATCH --exclusive                     # node should not be shared with other jobs, only use this if you intend the node to be usable only by you as this will block other users from submitting jobs     to the same node                
-#SBATCH --chdir=JHShj # From where you want the job to be run
+#SBATCH --chdir=/vols/opig/users/raja/deep-molecular-optimization # From where you want the job to be run
 #SBATCH --mail-user=arun.raja@dtc.ox.ac.uk  # set email address                           
 #SBATCH --mail-type=ALL                 # Spam us with everything, caution
 #SBATCH --mail-type=begin               # Instead only email when job begins...
