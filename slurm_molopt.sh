@@ -7,7 +7,7 @@
 #SBATCH --gpus-per-task=1           # number of cores per task                          
 #SBATCH --nodes=1                       # number of nodes                                       
 #S BATCH --exclusive                     # node should not be shared with other jobs, only use this if you intend the node to be usable only by you as this will block other users from submitting jobs     to the same node                
-#SBATCH --chdir=/vols/opig/users/raja # From where you want the job to be run
+#SBATCH --chdir=/vols/opig/users/raja/deep-molecular-optimization # From where you want the job to be run
 #SBATCH --mail-user=arun.raja@dtc.ox.ac.uk  # set email address                           
 #SBATCH --mail-type=ALL                 # Spam us with everything, caution
 #SBATCH --mail-type=begin               # Instead only email when job begins...
@@ -28,4 +28,4 @@ done
 source activate molopt
 echo $CONDA_DEFAULT_ENV
 echo "training"
-python deep-molecular-optimization/train.py --data-path data/chembl_02 --save-directory train_transformer --model-choice transformer --num-epoch 1 transformer
+python train.py --data-path data/chembl_02 --save-directory train_transformer --model-choice transformer --num-epoch 1 transformer
