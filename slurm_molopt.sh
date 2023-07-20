@@ -7,7 +7,7 @@
 #SBATCH --gpus-per-task=1           # number of cores per task                          
 #SBATCH --nodes=1                       # number of nodes                                       
 #S BATCH --exclusive                     # node should not be shared with other jobs, only use this if you intend the node to be usable only by you as this will block other users from submitting jobs     to the same node                
-#SBATCH --chdir=/vols/opig/users/raja # From where you want the job to be run
+#SBATCH --chdir=/vols/opig/users/raja/deep_molecular-optimization # From where you want the job to be run
 #SBATCH --mail-user=arun.raja@dtc.ox.ac.uk  # set email address                           
 #SBATCH --mail-type=ALL                 # Spam us with everything, caution
 #SBATCH --mail-type=begin               # Instead only email when job begins...
@@ -21,18 +21,6 @@
 echo $CUDA_VISIBLE_DEVICES 
 #python -m venv gin7
 #source gin7/bin/activate
-source /vols/opig/users/raja/miniconda3/etc/profile.d/conda.sh
-#conda create --name gin_conda
-conda activate gin_conda
-echo "all proteins rad 1.0- rf"
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset chembl_dopamine_d2 --model rf --rad 1.0 
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset chembl_factor_xa --model rf --rad 1.0
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset postera_sars_cov_2_mpro --model rf --rad 1.0
-echo "all proteins rad 1.0 - knn"
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset chembl_factor_xa --model knn --rad 1.0
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset chembl_dopamine_d2 --model knn --rad 1.0
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset postera_sars_cov_2_mpro --model knn --rad 1.0
-echo "all proteins rad 1.0 - mlp"
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset chembl_factor_xa --model mlp --rad 1.0
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset chembl_dopamine_d2 --model mlp --rad 1.0
-python GDL-ActivityCliff-3D/e3fp_exp.py --dataset postera_sars_cov_2_mpro --model mlp --rad 1.0
+source activate molopt
+echo "training"
+python train.py --data-path data/chembl_02 --save-directory train_transformer --model-choice transformer --num-epoch 1 transformer
