@@ -24,4 +24,4 @@ echo $(pwd)
 #source gin7/bin/activate
 source activate molopt
 echo "training"
-python train.py --data-path data/chembl_02 --save-directory train_transformer --model-choice transformer --num-epoch 1 transformer
+python deep-molecular-optimization/train.py --data-path data/chembl_02 --save-directory train_transformer --model-choice transformer --num-epoch 1 transformer
