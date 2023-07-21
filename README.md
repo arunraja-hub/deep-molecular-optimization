@@ -24,8 +24,8 @@ python preprocess.py --input-data-path data/chembl_02/mmp_prop.csv
 ```
 **2. Train model**
 
- Train the model and save results and logs to `experiments/save_directory/`; The model from each epoch is saved in 
-`experiments/save_directory/checkpoint/`; The training loss, validation loss and validation accuracy are saved in `experiments/save_directory/tensorboard/`.
+ Train the model and save results and logs to `experiments/$save_directory$/`; The model from each epoch is saved in 
+`experiments/$save_directory$/checkpoint/`; The training loss, validation loss and validation accuracy are saved in `experiments/$save_directory$/tensorboard/`.
 ```
 python train.py --data-path data/chembl_02 --save-directory train_transformer --model-choice transformer transformer
 ``` 
@@ -33,7 +33,7 @@ A pre-trained Transformer model can be found [here](https://zenodo.org/record/55
 
 **3. Generate molecules**
 
-Use the model saved at a given epoch (e.g. 60) to generate molecules for the given test filename, and save the results to `experiments/save_directory/test_file_name/evaluation_epoch/generated_molecules.csv`. The three test sets used in our paper can be found in `data/chembl_02/` as below,
+Use the model saved at a given epoch (e.g. 60) to generate molecules for the given test filename, and save the results to `experiments/$save_directory$/test_file_name/evaluation_epoch/generated_molecules.csv`. The three test sets used in our paper can be found in `data/chembl_02/` as below,
 
 - Test-Original ->` data/chembl_02/test.csv`
 - Test-Molecule -> `data/chembl_02/test_not_in_train.csv`
