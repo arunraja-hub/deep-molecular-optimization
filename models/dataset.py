@@ -91,6 +91,10 @@ class Dataset(tud.Dataset):
         max_length_source = max([seq.size(0) for seq in source_encoded])
         # padded source sequences with zeroes
         collated_arr_source = torch.zeros(len(source_plus_target_encoded), max_length_source, dtype=torch.long)
+        collated_just_source = torch.zeros(len(source_encoded), max_length_source, dtype=torch.long)
+        print('collated_arr_source', collated_arr_source.shape)
+        print('collated_just_source',collated_just_source.shape)
+
         for i, seq in enumerate(source_plus_target_encoded):
             collated_arr_source[i, :seq.size(0)] = seq
         # length of each source sequence
@@ -113,6 +117,8 @@ class Dataset(tud.Dataset):
             trg_mask = None
             max_length_target = None
             collated_arr_target = None
+
+        print('collated_arr_target',collated_arr_target.shape)
 
         return collated_arr_source, source_length, collated_arr_target, src_mask, trg_mask, max_length_target, data
 
