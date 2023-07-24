@@ -46,7 +46,7 @@ class Dataset(tud.Dataset):
         row = self._data.iloc[i]
 
         # tokenize and encode source smiles
-        source_smi = pd.DataFrame(numpy.vstack((row['Source_Mol'].values, row['Target_Mol'].values)))
+        source_smi = pd.DataFrame(numpy.vstack((row['Source_Mol'], row['Target_Mol'])))
         # row['Source_Mol']
         source_tokens = []
 
@@ -62,7 +62,7 @@ class Dataset(tud.Dataset):
 
         # tokenize and encode target smiles if it is for training instead of evaluation
         if not self._prediction_mode:
-            target_smi = pd.DataFrame(numpy.vstack((row['Target_Mol'].values, row['Source_Mol'].values)))
+            target_smi = pd.DataFrame(numpy.vstack((row['Target_Mol'], row['Source_Mol'])))
             # row['Target_Mol']
             target_tokens = self._tokenizer.tokenize(target_smi)
             target_encoded = self._vocabulary.encode(target_tokens)
