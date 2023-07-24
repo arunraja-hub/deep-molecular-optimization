@@ -32,11 +32,15 @@ def split_data(input_transformations_path, LOG=None):
     :return: dataframe
     """
     data = pd.read_csv(input_transformations_path, sep=",")
+    switched_data = data[[
+"Target_Mol_ID","Source_Mol_ID","Target_Mol","Source_Mol","Target_Mol_LogD","Source_Mol_LogD","Delta_LogD","Target_Mol_Solubility",
+"Source_Mol_Solubility","Delta_Solubility","Target_Mol_Clint","Source_Mol_Clint","Delta_Clint","Transformation","Core"]]
+    combined_data = pd.concat([data,switched_data],ignore_index=True)
     if LOG:
         LOG.info("Read %s file" % input_transformations_path)
 
     train, test = train_test_split(
-        data, test_size=0.1, random_state=SEED)
+        combined_data, test_size=0.1, random_state=SEED)
     train, validation = train_test_split(train, test_size=0.1, random_state=SEED)
     if LOG:
         LOG.info("Train, Validation, Test: %d, %d, %d" % (len(train), len(validation), len(test)))

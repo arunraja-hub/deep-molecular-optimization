@@ -8,9 +8,6 @@ import pandas as pd
 import torch
 import torch.utils.data as tud
 from torch.autograd import Variable
-from itertools import chain
-import numpy
-
 
 import configuration.config_default as cfgd
 from models.transformer.module.subsequent_mask import subsequent_mask
@@ -46,8 +43,7 @@ class Dataset(tud.Dataset):
         row = self._data.iloc[i]
 
         # tokenize and encode source smiles
-        source_smi = pd.DataFrame(numpy.vstack((row['Source_Mol'], row['Target_Mol'])))
-        # row['Source_Mol']
+        source_smi = row['Source_Mol']
         source_tokens = []
 
         for property_name in cfgd.PROPERTIES:
@@ -62,8 +58,7 @@ class Dataset(tud.Dataset):
 
         # tokenize and encode target smiles if it is for training instead of evaluation
         if not self._prediction_mode:
-            target_smi = pd.DataFrame(numpy.vstack((row['Target_Mol'], row['Source_Mol'])))
-            # row['Target_Mol']
+            target_smi = row['Target_Mol']
             target_tokens = self._tokenizer.tokenize(target_smi)
             target_encoded = self._vocabulary.encode(target_tokens)
 
@@ -87,17 +82,10 @@ class Dataset(tud.Dataset):
             source_encoded, target_encoded, data = zip(*data_all)
             data = pd.DataFrame(data)
 
-        # source_plus_target_encoded = chain(source_encoded,target_encoded)
-        # target_plus_plus_encoded = chain(target_encoded,source_encoded)
-
         # maximum length of source sequences
         max_length_source = max([seq.size(0) for seq in source_encoded])
         # padded source sequences with zeroes
-        # collated_arr_source = torch.zeros(len(source_plus_target_encoded), max_length_source, dtype=torch.long)
         collated_arr_source = torch.zeros(len(source_encoded), max_length_source, dtype=torch.long)
-        print('collated_arr_source', collated_arr_source.shape)
-        # print('collated_just_source',collated_just_source.shape)
-
         for i, seq in enumerate(source_encoded):
             collated_arr_source[i, :seq.size(0)] = seq
         # length of each source sequence
@@ -121,7 +109,4 @@ class Dataset(tud.Dataset):
             max_length_target = None
             collated_arr_target = None
 
-        print('collated_arr_target',collated_arr_target.shape)
-
         return collated_arr_source, source_length, collated_arr_target, src_mask, trg_mask, max_length_target, data
-
