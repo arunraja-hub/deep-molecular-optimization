@@ -84,8 +84,8 @@ class Dataset(tud.Dataset):
             source_encoded, target_encoded, data = zip(*data_all)
             data = pd.DataFrame(data)
 
-        source_plus_target_encoded = chain (source,target)
-        target_plus_plus_encoded = chain(target,source)
+        source_plus_target_encoded = chain(source_encoded,target_encoded)
+        target_plus_plus_encoded = chain(target_encoded,source_encoded)
 
         # maximum length of source sequences
         max_length_source = max([seq.size(0) for seq in source_encoded])
