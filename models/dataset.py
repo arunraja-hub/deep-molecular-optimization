@@ -8,6 +8,8 @@ import pandas as pd
 import torch
 import torch.utils.data as tud
 from torch.autograd import Variable
+from itertools import chain
+
 
 import configuration.config_default as cfgd
 from models.transformer.module.subsequent_mask import subsequent_mask
@@ -82,23 +84,26 @@ class Dataset(tud.Dataset):
             source_encoded, target_encoded, data = zip(*data_all)
             data = pd.DataFrame(data)
 
+        source_plus_target_encoded = chain (source,target)
+        target_plus_plus_encoded = chain(target,source)
+
         # maximum length of source sequences
         max_length_source = max([seq.size(0) for seq in source_encoded])
         # padded source sequences with zeroes
-        collated_arr_source = torch.zeros(len(source_encoded), max_length_source, dtype=torch.long)
-        for i, seq in enumerate(source_encoded):
+        collated_arr_source = torch.zeros(len(source_plus_target_encoded), max_length_source, dtype=torch.long)
+        for i, seq in enumerate(source_plus_target_encoded):
             collated_arr_source[i, :seq.size(0)] = seq
         # length of each source sequence
-        source_length = [seq.size(0) for seq in source_encoded]
+        source_length = [seq.size(0) for seq in source_plus_target_encoded]
         source_length = torch.tensor(source_length)
         # mask of source seqs
         src_mask = (collated_arr_source !=0).unsqueeze(-2)
 
         # target seq
         if not is_prediction_mode:
-            max_length_target = max([seq.size(0) for seq in target_encoded])
-            collated_arr_target = torch.zeros(len(target_encoded), max_length_target, dtype=torch.long)
-            for i, seq in enumerate(target_encoded):
+            max_length_target = max([seq.size(0) for seq in target_plus_plus_encoded])
+            collated_arr_target = torch.zeros(len(target_plus_plus_encoded), max_length_target, dtype=torch.long)
+            for i, seq in enumerate(target_plus_plus_encoded):
                 collated_arr_target[i, :seq.size(0)] = seq
 
             trg_mask = (collated_arr_target != 0).unsqueeze(-2)
