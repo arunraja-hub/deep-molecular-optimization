@@ -45,7 +45,8 @@ class Dataset(tud.Dataset):
         row = self._data.iloc[i]
 
         # tokenize and encode source smiles
-        source_smi = row['Source_Mol']
+        source_smi = pd.DataFrame(numpy.vstack((row['Source_Mol'].values, row['Target_Mol'].values)))
+        # row['Source_Mol']
         source_tokens = []
 
         for property_name in cfgd.PROPERTIES:
@@ -60,7 +61,8 @@ class Dataset(tud.Dataset):
 
         # tokenize and encode target smiles if it is for training instead of evaluation
         if not self._prediction_mode:
-            target_smi = row['Target_Mol']
+            target_smi = pd.DataFrame(numpy.vstack((row['Target_Mol'].values, row['Source_Mol'].values)))
+            # row['Target_Mol']
             target_tokens = self._tokenizer.tokenize(target_smi)
             target_encoded = self._vocabulary.encode(target_tokens)
 
@@ -84,30 +86,30 @@ class Dataset(tud.Dataset):
             source_encoded, target_encoded, data = zip(*data_all)
             data = pd.DataFrame(data)
 
-        source_plus_target_encoded = chain(source_encoded,target_encoded)
-        target_plus_plus_encoded = chain(target_encoded,source_encoded)
+        # source_plus_target_encoded = chain(source_encoded,target_encoded)
+        # target_plus_plus_encoded = chain(target_encoded,source_encoded)
 
         # maximum length of source sequences
         max_length_source = max([seq.size(0) for seq in source_encoded])
         # padded source sequences with zeroes
-        collated_arr_source = torch.zeros(len(source_plus_target_encoded), max_length_source, dtype=torch.long)
-        collated_just_source = torch.zeros(len(source_encoded), max_length_source, dtype=torch.long)
+        # collated_arr_source = torch.zeros(len(source_plus_target_encoded), max_length_source, dtype=torch.long)
+        collated_arr_source = torch.zeros(len(source_encoded), max_length_source, dtype=torch.long)
         print('collated_arr_source', collated_arr_source.shape)
-        print('collated_just_source',collated_just_source.shape)
+        # print('collated_just_source',collated_just_source.shape)
 
-        for i, seq in enumerate(source_plus_target_encoded):
+        for i, seq in enumerate(source_encoded):
             collated_arr_source[i, :seq.size(0)] = seq
         # length of each source sequence
-        source_length = [seq.size(0) for seq in source_plus_target_encoded]
+        source_length = [seq.size(0) for seq in source_encoded]
         source_length = torch.tensor(source_length)
         # mask of source seqs
         src_mask = (collated_arr_source !=0).unsqueeze(-2)
 
         # target seq
         if not is_prediction_mode:
-            max_length_target = max([seq.size(0) for seq in target_plus_plus_encoded])
-            collated_arr_target = torch.zeros(len(target_plus_plus_encoded), max_length_target, dtype=torch.long)
-            for i, seq in enumerate(target_plus_plus_encoded):
+            max_length_target = max([seq.size(0) for seq in target_encoded])
+            collated_arr_target = torch.zeros(len(target_encoded), max_length_target, dtype=torch.long)
+            for i, seq in enumerate(target_encoded):
                 collated_arr_target[i, :seq.size(0)] = seq
 
             trg_mask = (collated_arr_target != 0).unsqueeze(-2)
