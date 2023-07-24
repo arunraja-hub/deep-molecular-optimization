@@ -9,6 +9,7 @@ import torch
 import torch.utils.data as tud
 from torch.autograd import Variable
 from itertools import chain
+import numpy
 
 
 import configuration.config_default as cfgd
