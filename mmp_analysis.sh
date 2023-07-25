@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J molopt
+#SBATCH -J mmp-ana-molopt
 #SBATCH --time=48:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
