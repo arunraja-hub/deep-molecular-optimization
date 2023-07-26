@@ -1,6 +1,0 @@
-16:24:58: base_trainer.__init__ +21: INFO     Namespace(H=8, N=6, adam_beta1=0.9, adam_beta2=0.98, adam_eps=1e-09, batch_size=128, d_ff=2048, d_model=256, data_path='data/chembl_02', dropout=0.1, factor=1.0, label_smoothing=0.0, model_choice='transformer', num_epoch=60, save_directory='train_transformer', starting_epoch=1, warmup_steps=4000)
-16:25:00: transformer_trainer.train +191: INFO     Starting EPOCH #1
-16:25:00: transformer_trainer.train +193: INFO     Training start
-15:09:44: base_trainer.__init__ +21: INFO     Namespace(H=8, N=6, adam_beta1=0.9, adam_beta2=0.98, adam_eps=1e-09, batch_size=128, d_ff=2048, d_model=256, data_path='data/chembl_02', dropout=0.1, factor=1.0, label_smoothing=0.0, model_choice='transformer', num_epoch=1, save_directory='train_transformer', starting_epoch=1, warmup_steps=4000)
-15:09:45: transformer_trainer.train +191: INFO     Starting EPOCH #1
-15:09:45: transformer_trainer.train +193: INFO     Training start
