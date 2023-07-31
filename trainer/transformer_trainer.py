@@ -15,6 +15,10 @@ from trainer.base_trainer import BaseTrainer
 from models.transformer.module.label_smoothing import LabelSmoothing
 from models.transformer.module.simpleloss_compute import SimpleLossCompute
 
+from ray import tune
+from ray.air import Checkpoint, session
+from ray.tune.schedulers import ASHAScheduler
+
 
 class TransformerTrainer(BaseTrainer):
 
@@ -24,10 +28,20 @@ class TransformerTrainer(BaseTrainer):
     def get_model(self, opt, vocab, device):
         vocab_size = len(vocab.tokens())
         # build a model from scratch or load a model from a given epoch
+
+        #search-space
+        config = {
+                        "N": tune.choice([2 * i for i in range(1,6)]),
+                        "d_model": tune.choice([2 ** i for i in range(6,10)]),
+                        "d_ff": tune.choice([2 ** i for i in range(8,12)]),
+                        "H": tune.choice([2 ** i for i in range(2,5)]),
+                        "dropout": tune.choice([0.1,0.3,0.5]),
+                    }
+
         if opt.starting_epoch == 1:
             # define model
-            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=opt.N,
-                                          d_model=opt.d_model, d_ff=opt.d_ff, h=opt.H, dropout=opt.dropout)
+            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=config.N,
+                                          d_model=config.d_model, d_ff=config.d_ff, h=config.H, dropout=config.dropout)
         else:
             # Load model
             file_name = os.path.join(self.save_path, f'checkpoint/model_{opt.starting_epoch-1}.pt')
@@ -146,11 +160,11 @@ class TransformerTrainer(BaseTrainer):
     def _get_model_parameters(self, vocab_size, opt):
         return {
             'vocab_size': vocab_size,
-            'N': opt.N,
-            'd_model': opt.d_model,
-            'd_ff': opt.d_ff,
-            'H': opt.H,
-            'dropout': opt.dropout
+            'N': config.N,
+            'd_model': config.d_model,
+            'd_ff': config.d_ff,
+            'H': config.H,
+            'dropout': config.dropout
         }
 
     def save(self, model, optim, epoch, vocab_size, opt):
