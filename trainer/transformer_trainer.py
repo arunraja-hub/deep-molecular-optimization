@@ -15,9 +15,8 @@ from trainer.base_trainer import BaseTrainer
 from models.transformer.module.label_smoothing import LabelSmoothing
 from models.transformer.module.simpleloss_compute import SimpleLossCompute
 
-from ray import tune
-from ray.air import Checkpoint, session
-from ray.tune.schedulers import ASHAScheduler
+import optuna
+from optuna.trial import TrialState
 
 
 class TransformerTrainer(BaseTrainer):
@@ -25,7 +24,7 @@ class TransformerTrainer(BaseTrainer):
     def __init__(self, opt):
         super().__init__(opt)
 
-    def get_model(self, opt, vocab, device):
+    def get_model(self, opt, vocab, device, trial):
         vocab_size = len(vocab.tokens())
         # build a model from scratch or load a model from a given epoch
 
@@ -37,11 +36,16 @@ class TransformerTrainer(BaseTrainer):
                         "H": tune.choice([2 ** i for i in range(2,5)]),
                         "dropout": tune.choice([0.1,0.3,0.5]),
                     }
+        N = trial.suggest_int("N", [2 * i for i in range(1,6)])
+        d_model = trial.suggest_int("d_model", [2 ** i for i in range(6,10)] )
+        d_ff = trial.suggest_int("d_ff",[2 ** i for i in range(8,12)])
+        h = trial.suggest_int("H", [2 ** i for i in range(2,5)])
+        dropout = trial.suggest_float("N", [0.1,0.3,0.5])
 
         if opt.starting_epoch == 1:
             # define model
-            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=config.N,
-                                          d_model=config.d_model, d_ff=config.d_ff, h=config.H, dropout=config.dropout)
+            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=N,
+                                          d_model=d_model, d_ff=d_ff, h=h, dropout=dropout)
         else:
             # Load model
             file_name = os.path.join(self.save_path, f'checkpoint/model_{opt.starting_epoch-1}.pt')
@@ -75,7 +79,7 @@ class TransformerTrainer(BaseTrainer):
             optim = self._load_optimizer_from_epoch(model, file_name)
         return optim
 
-    def train_epoch(self, dataloader, model, loss_compute, device):
+    def train_epoch(self, dataloader, model, loss_compute, device,trial):
 
         pad = cfgd.DATA_DEFAULT['padding_value']
         total_loss = 0
