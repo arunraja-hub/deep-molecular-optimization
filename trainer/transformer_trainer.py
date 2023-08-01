@@ -51,7 +51,7 @@ class TransformerTrainer(BaseTrainer):
                                           d_model=d_model, d_ff=d_ff, h=h, dropout=dropout)
         else:
             # Load model
-            file_name = os.path.join(self.save_path, f'checkpoint/model_{opt.starting_epoch-1}.pt')
+            file_name = os.path.join(self.save_path, f'checkpoint_original_source2target/model_{opt.starting_epoch-1}.pt')
             model= EncoderDecoder.load_from_file(file_name)
         # move to GPU
         model.to(device)
