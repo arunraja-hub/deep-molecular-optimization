@@ -1,5 +1,8 @@
 import os
 import pickle as pkl
+import argparse
+import configuration.opts as opts
+
 
 import torch
 
@@ -29,18 +32,18 @@ class TransformerTrainer(BaseTrainer):
         # build a model from scratch or load a model from a given epoch
 
         #search-space
-        config = {
-                        "N": tune.choice([2 * i for i in range(1,6)]),
-                        "d_model": tune.choice([2 ** i for i in range(6,10)]),
-                        "d_ff": tune.choice([2 ** i for i in range(8,12)]),
-                        "H": tune.choice([2 ** i for i in range(2,5)]),
-                        "dropout": tune.choice([0.1,0.3,0.5]),
-                    }
-        N = trial.suggest_int("N", [2 * i for i in range(1,6)])
-        d_model = trial.suggest_int("d_model", [2 ** i for i in range(6,10)] )
-        d_ff = trial.suggest_int("d_ff",[2 ** i for i in range(8,12)])
-        h = trial.suggest_int("H", [2 ** i for i in range(2,5)])
-        dropout = trial.suggest_float("N", [0.1,0.3,0.5])
+        # config = {
+        #                 "N": tune.choice([2 * i for i in range(1,6)]),
+        #                 "d_model": tune.choice([2 ** i for i in range(6,10)]),
+        #                 "d_ff": tune.choice([2 ** i for i in range(8,12)]),
+        #                 "H": tune.choice([2 ** i for i in range(2,5)]),
+        #                 "dropout": tune.choice([0.1,0.3,0.5]),
+        #             }
+        N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
+        d_model = trial.suggest_categorical ("d_model", [2 ** i for i in range(6,10)] )
+        d_ff = trial.suggest_categorical ("d_ff",[2 ** i for i in range(8,12)])
+        h = trial.suggest_categorical ("H", [2 ** i for i in range(2,5)])
+        dropout = trial.suggest_float ("dropout", 0.1,0.5,step=0.2)
 
         if opt.starting_epoch == 1:
             # define model
@@ -79,7 +82,7 @@ class TransformerTrainer(BaseTrainer):
             optim = self._load_optimizer_from_epoch(model, file_name)
         return optim
 
-    def train_epoch(self, dataloader, model, loss_compute, device,trial):
+    def train_epoch(self, dataloader, model, loss_compute, device):
 
         pad = cfgd.DATA_DEFAULT['padding_value']
         total_loss = 0
@@ -186,7 +189,7 @@ class TransformerTrainer(BaseTrainer):
 
         torch.save(save_dict, file_name)
 
-    def train(self, opt):
+    def train(self, opt, trial):
         # Load vocabulary
         with open(os.path.join(opt.data_path, 'vocab.pkl'), "rb") as input_file:
             vocab = pkl.load(input_file)
@@ -198,7 +201,7 @@ class TransformerTrainer(BaseTrainer):
 
         device = ut.allocate_gpu()
 
-        model = self.get_model(opt, vocab, device)
+        model = self.get_model(opt, vocab, device, trial)
         optim = self.get_optimization(model, opt)
 
         pad_idx = cfgd.DATA_DEFAULT['padding_value']
@@ -228,6 +231,12 @@ class TransformerTrainer(BaseTrainer):
                 SimpleLossCompute(
                     model.generator, criterion, None),
                 device, vocab)
+            
+            trial.report(accuracy, epoch)
+
+            # Handle pruning based on the intermediate value.
+            if trial.should_prune():
+                raise optuna.exceptions.TrialPruned()
 
 
             self.LOG.info("Validation end")
