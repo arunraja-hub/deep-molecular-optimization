@@ -18,6 +18,9 @@ from trainer.base_trainer import BaseTrainer
 from models.transformer.module.label_smoothing import LabelSmoothing
 from models.transformer.module.simpleloss_compute import SimpleLossCompute
 
+import optuna
+from optuna.trial import TrialState
+
 
 class TransformerTrainer(BaseTrainer):
 
@@ -198,7 +201,7 @@ class TransformerTrainer(BaseTrainer):
 
         device = ut.allocate_gpu()
 
-        model = self.get_model(opt, vocab, device, trial)
+        model = self.get_model(opt, vocab, device)
         optim = self.get_optimization(model, opt)
 
         pad_idx = cfgd.DATA_DEFAULT['padding_value']
