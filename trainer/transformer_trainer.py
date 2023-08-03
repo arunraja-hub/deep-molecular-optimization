@@ -27,7 +27,7 @@ class TransformerTrainer(BaseTrainer):
     def __init__(self, opt):
         super().__init__(opt)
 
-    def get_model(self, opt, vocab, device):
+    def get_model(self, opt, vocab, device, trial):
         vocab_size = len(vocab.tokens())
         # build a model from scratch or load a model from a given epoch
 
@@ -201,7 +201,7 @@ class TransformerTrainer(BaseTrainer):
 
         device = ut.allocate_gpu()
 
-        model = self.get_model(opt, vocab, device)
+        model = self.get_model(opt, vocab, device,trial)
         optim = self.get_optimization(model, opt)
 
         pad_idx = cfgd.DATA_DEFAULT['padding_value']
