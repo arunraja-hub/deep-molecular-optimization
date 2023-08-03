@@ -26,7 +26,7 @@ if __name__ == "__main__":
     #         trainer.train(opt=opt,trial=trial)
 
     study = optuna.create_study(study_name="transformer-original-source2target-optuna-study", direction="maximize")
-    study.optimize(objective, n_trials=100, timeout=600)
+    study.optimize(objective, n_trials=2, timeout=600)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
     complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
