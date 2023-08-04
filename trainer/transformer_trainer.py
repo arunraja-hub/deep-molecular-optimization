@@ -47,8 +47,8 @@ class TransformerTrainer(BaseTrainer):
 
         if opt.starting_epoch == 1:
             # define model
-            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=opt.N,
-                                          d_model=opt.d_model, d_ff=opt.d_ff, h=opt.H, dropout=opt.dropout)
+            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=N,
+                                          d_model=d_model, d_ff=d_ff, h=H, dropout=dropout)
         else:
             # Load model
             file_name = os.path.join(self.save_path, f'checkpoint_switch_source_target/model_{opt.starting_epoch-1}.pt')
