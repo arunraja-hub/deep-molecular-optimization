@@ -15,10 +15,10 @@ class BaseTrainer(ABC):
     def __init__(self, opt):
 
         self.save_path = os.path.join('experiments', opt.save_directory)
-        self.summary_writer = SummaryWriter(logdir=os.path.join(self.save_path, 'tensorboard_original_source2target_with_optuna'))  
-        LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'train_model.log'))
-        self.LOG = LOG
-        self.LOG.info(opt)
+        self.summary_writer = SummaryWriter(logdir=os.path.join(self.save_path, 'tensorboard-original-source2target-with-optuna'))
+        # LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'train_model-switch-source-target.log'))
+        # self.LOG = LOG
+        # self.LOG.info(opt)
 
     def initialize_dataloader(self, data_path, batch_size, vocab, data_type):
         # Read train or validation
