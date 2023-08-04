@@ -18,6 +18,9 @@ from trainer.base_trainer import BaseTrainer
 from models.transformer.module.label_smoothing import LabelSmoothing
 from models.transformer.module.simpleloss_compute import SimpleLossCompute
 
+import utils.log as ul
+
+
 import optuna
 from optuna.trial import TrialState
 
@@ -29,26 +32,21 @@ class TransformerTrainer(BaseTrainer):
 
     def get_model(self, opt, vocab, device, trial):
         vocab_size = len(vocab.tokens())
-        # build a model from scratch or load a model from a given epoch
 
-        #search-space
-        # config = {
-        #                 "N": tune.choice([2 * i for i in range(1,6)]),
-        #                 "d_model": tune.choice([2 ** i for i in range(6,10)]),
-        #                 "d_ff": tune.choice([2 ** i for i in range(8,12)]),
-        #                 "H": tune.choice([2 ** i for i in range(2,5)]),
-        #                 "dropout": tune.choice([0.1,0.3,0.5]),
-        #             }
+        LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'train_model-switch-source-target.log'))
+        self.LOG = LOG
+
         N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
         d_model = trial.suggest_categorical ("d_model", [2 ** i for i in range(6,10)] )
         d_ff = trial.suggest_categorical ("d_ff",[2 ** i for i in range(8,12)])
-        h = trial.suggest_categorical ("H", [2 ** i for i in range(2,5)])
+        h = trial.suggest_categorical ("h", [2 ** i for i in range(2,5)])
         dropout = trial.suggest_float ("dropout", 0.1,0.5,step=0.2)
 
         if opt.starting_epoch == 1:
             # define model
+            self.LOG.info("Optuna current params:{}".format(trial.params))
             model = EncoderDecoder.make_model(vocab_size, vocab_size, N=N,
-                                          d_model=d_model, d_ff=d_ff, h=H, dropout=dropout)
+                                          d_model=d_model, d_ff=d_ff, h=h, dropout=dropout)
         else:
             # Load model
             file_name = os.path.join(self.save_path, f'checkpoint_switch_source_target/model_{opt.starting_epoch-1}.pt')
