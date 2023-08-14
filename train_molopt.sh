@@ -30,4 +30,4 @@ done
 source activate molopt
 echo $CONDA_DEFAULT_ENV
 echo "training"
-python train.py --data-path data/chembl_02 --save-directory train_transformer_1epoch_trial --model-choice transformer --num-epoch 1 transformer
+python train.py --data-path data/chembl_02 --save-directory train_transformer_1epoch_trial --model-choice transformer --num-epoch 10 transformer
