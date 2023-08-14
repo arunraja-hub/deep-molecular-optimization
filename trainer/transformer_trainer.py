@@ -230,7 +230,8 @@ class TransformerTrainer(BaseTrainer):
                     model.generator, criterion, None),
                 device, vocab)
             
-            trial.report(accuracy, epoch)
+            print('optuna trial.report(accuracy, step= epoch)')
+            trial.report(accuracy, step = epoch)
 
             # Handle pruning based on the intermediate value.
             if trial.should_prune():
@@ -244,3 +245,5 @@ class TransformerTrainer(BaseTrainer):
                                                                            accuracy))
 
             self.to_tensorboard(loss_epoch_train, loss_epoch_validation, accuracy, epoch)
+
+        return loss_epoch_train, loss_epoch_validation, accuracy
