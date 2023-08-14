@@ -197,7 +197,9 @@ class TransformerTrainer(BaseTrainer):
         dataloader_train = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'train')
         dataloader_validation = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'validation')
 
+        peinr('----')
         device = ut.allocate_gpu()
+        print('>>>>')
 
         model = self.get_model(opt, vocab, device, trial)
         optim = self.get_optimization(model, opt)
