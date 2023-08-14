@@ -36,17 +36,17 @@ class TransformerTrainer(BaseTrainer):
         LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'tensorboard-original-source2target-with-optuna.log'))
         self.LOG = LOG
 
-        N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
-        d_model = trial.suggest_categorical ("d_model", [2 ** i for i in range(6,10)] )
-        d_ff = trial.suggest_categorical ("d_ff",[2 ** i for i in range(8,12)])
-        h = trial.suggest_categorical ("h", [2 ** i for i in range(2,5)])
-        dropout = trial.suggest_float ("dropout", 0.1,0.5,step=0.2)
+        opt.N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
+        opt.d_model = trial.suggest_categorical ("d_model", [2 ** i for i in range(6,10)] )
+        opt.d_ff = trial.suggest_categorical ("d_ff",[2 ** i for i in range(8,12)])
+        opt.h = trial.suggest_categorical ("h", [2 ** i for i in range(2,5)])
+        opt.dropout = trial.suggest_float ("dropout", 0.1,0.5,step=0.2)
 
         if opt.starting_epoch == 1:
             # define model
             self.LOG.info("Optuna current params:{}".format(trial.params))
-            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=N,
-                                          d_model=d_model, d_ff=d_ff, h=h, dropout=dropout)
+            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=opt.N,
+                                          d_model=opt.d_model, d_ff=opt.d_ff, h=opt.h, dropout=opt.dropout)
         else:
             # Load model
             file_name = os.path.join(self.save_path, f'checkpoint_original_source2target/model_{opt.starting_epoch-1}.pt')
@@ -165,11 +165,11 @@ class TransformerTrainer(BaseTrainer):
     def _get_model_parameters(self, vocab_size, opt):
         return {
             'vocab_size': vocab_size,
-            'N': config.N,
-            'd_model': config.d_model,
-            'd_ff': config.d_ff,
-            'H': config.H,
-            'dropout': config.dropout
+            'N': opt.N,
+            'd_model': opt.d_model,
+            'd_ff': opt.d_ff,
+            'H': opt.H,
+            'dropout': opt.dropout
         }
 
     def save(self, model, optim, epoch, vocab_size, opt):
