@@ -5,6 +5,8 @@ import configuration.opts as opts
 
 
 import torch
+torch.cuda.empty_cache()
+
 
 import configuration.config_default as cfgd
 import utils.log as ul
