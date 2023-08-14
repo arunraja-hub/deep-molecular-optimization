@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --gpus-per-task=1
 #SBATCH --cpus-per-gpu=1
-#SBATCH --mem-per-cpu=12000
+#SBATCH --mem-per-cpu=48000
 #S BATCH --exclusive
 #SBATCH --chdir=/vols/opig/users/raja/deep-molecular-optimization
 #SBATCH --mail-user=arun.raja@dtc.ox.ac.uk
