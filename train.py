@@ -20,7 +20,7 @@ if __name__ == "__main__":
         def objective(trial):
             trainer = TransformerTrainer(opt)
             loss_epoch_train, loss_epoch_validation, accuracy = trainer.train(opt=opt,trial=trial)
-            return loss_epoch_validation
+            return accuracy
     # elif opt.model_choice == 'seq2seq':
     #     def objective(trial):
     #         trainer = Seq2seqt(opt)
