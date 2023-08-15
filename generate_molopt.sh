@@ -30,6 +30,6 @@ done
 source activate molopt
 echo $CONDA_DEFAULT_ENV
 echo "generating"
-python evaluate.py --data-path experiments/evaluation_transformer/test/evaluation_60/generated_molecules_prop.csv
-python evaluate.py --data-path experiments/evaluation_transformer/test_not_in_train/evaluation_60/generated_molecules_prop.csv
-python evaluate.py --data-path experiments/evaluation_transformer/test_unseen_L-1_S01_C10_range/evaluation_60/generated_molecules_prop.csv --range-evaluation lower
+python generate.py --model-choice transformer --data-path data/chembl_02 --test-file-name test --model-path experiments/train_transformer/checkpoint --save-directory evaluation_transformer --epoch 60
+python generate.py --model-choice transformer --data-path data/chembl_02 --test-file-name test_not_in_train --model-path experiments/train_transformer/checkpoint --save-directory evaluation_transformer --epoch 60
+python generate.py --model-choice transformer --data-path data/chembl_02 --test-file-name test_unseen_L-1_S01_C10_range --model-path experiments/train_transformer/checkpoint --save-directory evaluation_transformer --epoch 60
