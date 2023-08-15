@@ -36,17 +36,17 @@ class TransformerTrainer(BaseTrainer):
         LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'train_model-switch-source-target.log'))
         self.LOG = LOG
 
-        N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
-        d_model = trial.suggest_categorical ("d_model", [2 ** i for i in range(6,10)] )
-        d_ff = trial.suggest_categorical ("d_ff",[2 ** i for i in range(8,12)])
-        h = trial.suggest_categorical ("h", [2 ** i for i in range(2,5)])
+        # N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
+        # d_model = trial.suggest_categorical ("d_model", [2 ** i for i in range(6,10)] )
+        # d_ff = trial.suggest_categorical ("d_ff",[2 ** i for i in range(8,12)])
+        # h = trial.suggest_categorical ("h", [2 ** i for i in range(2,5)])
         dropout = trial.suggest_float ("dropout", 0.1,0.5,step=0.2)
 
         if opt.starting_epoch == 1:
             # define model
             self.LOG.info("Optuna current params:{}".format(trial.params))
-            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=N,
-                                          d_model=d_model, d_ff=d_ff, h=h, dropout=dropout)
+            model = EncoderDecoder.make_model(vocab_size, vocab_size, N=opt.N,
+                                          d_model=opt.d_model, d_ff=opt.d_ff, h=opt.h, dropout=dropout)
         else:
             # Load model
             file_name = os.path.join(self.save_path, f'checkpoint_switch_source_target/model_{opt.starting_epoch-1}.pt')
@@ -230,7 +230,7 @@ class TransformerTrainer(BaseTrainer):
                     model.generator, criterion, None),
                 device, vocab)
             
-            self.LOG.info(trial.report(accuracy, epoch))
+            trial.report(accuracy, epoch)
 
             # Handle pruning based on the intermediate value.
             if trial.should_prune():

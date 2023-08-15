@@ -26,8 +26,9 @@ if __name__ == "__main__":
     #         trainer = Seq2seqt(opt)
     #         trainer.train(opt=opt,trial=trial)
 
-    study = optuna.create_study(study_name="train_model-switch-source-target", direction="maximize")
-    study.optimize(objective, n_trials=2, timeout=600)
+    study = optuna.create_study(study_name="train_model-switch-source-target", direction="maximize", 
+        pruner=optuna.pruners.MedianPruner(n_startup_trials=5, n_warmup_steps=30, interval_steps=10))
+    study.optimize(objective, n_trials=10)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
     complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
