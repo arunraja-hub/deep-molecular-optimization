@@ -64,5 +64,9 @@ if __name__ == "__main__":
     LOG.info("Save vocabulary to file: {}".format(output_file))
 
     # Split data into train, validation, test
-    train, validation, test = pdp.split_data(encoded_file, LOG)
+    train, validation, test, combined_data = pdp.split_data(encoded_file, LOG)
+
+    
+    print('---')
+    print(combined_data.columns)
 

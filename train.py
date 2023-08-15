@@ -19,13 +19,14 @@ if __name__ == "__main__":
     if opt.model_choice == 'transformer':
         def objective(trial):
             trainer = TransformerTrainer(opt)
-            trainer.train(opt=opt,trial=trial)
+            loss_epoch_train, loss_epoch_validation, accuracy = trainer.train(opt=opt,trial=trial)
+            return accuracy
     # elif opt.model_choice == 'seq2seq':
     #     def objective(trial):
     #         trainer = Seq2seqt(opt)
     #         trainer.train(opt=opt,trial=trial)
 
-    study = optuna.create_study(study_name="transformer-original-source2target-optuna-study", direction="maximize")
+    study = optuna.create_study(study_name="train_model-switch-source-target", direction="maximize")
     study.optimize(objective, n_trials=2, timeout=600)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])

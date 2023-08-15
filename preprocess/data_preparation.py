@@ -49,8 +49,9 @@ def split_data(input_transformations_path, LOG=None):
     train.to_csv(os.path.join(parent, "train.csv"), index=False)
     validation.to_csv(os.path.join(parent, "validation.csv"), index=False)
     test.to_csv(os.path.join(parent, "test.csv"), index=False)
+    combined_data.to_csv(os.path.join(parent, "combined_data.csv"), index=False)
 
-    return train, validation, test
+    return train, validation, test, combined_data
 
 def save_df_property_encoded(file_name, property_change_encoder, LOG=None):
     data = pd.read_csv(file_name, sep=",")
