@@ -169,7 +169,7 @@ class TransformerTrainer(BaseTrainer):
             'd_model': opt.d_model,
             'd_ff': opt.d_ff,
             'H': opt.H,
-            'dropout': trial.params.dropout
+            'dropout': opt.dropout
         }
 
     def save(self, model, optim, epoch, vocab_size, opt):
