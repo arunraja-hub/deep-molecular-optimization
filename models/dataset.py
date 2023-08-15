@@ -61,7 +61,7 @@ class Dataset(tud.Dataset):
             target_smi = row['Target_Mol']
             target_tokens = self._tokenizer.tokenize(target_smi)
             target_encoded = self._vocabulary.encode(target_tokens)
-
+            # breakpoint()
             return torch.tensor(source_encoded, dtype=torch.long), torch.tensor(
                 target_encoded, dtype=torch.long), row
         else:
@@ -108,5 +108,5 @@ class Dataset(tud.Dataset):
             trg_mask = None
             max_length_target = None
             collated_arr_target = None
-
+        breakpoint()
         return collated_arr_source, source_length, collated_arr_target, src_mask, trg_mask, max_length_target, data
