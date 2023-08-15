@@ -46,7 +46,7 @@ class TransformerTrainer(BaseTrainer):
             # define model
             self.LOG.info("Optuna current params:{}".format(trial.params))
             model = EncoderDecoder.make_model(vocab_size, vocab_size, N=opt.N,
-                                          d_model=opt.d_model, d_ff=opt.d_ff, h=opt.h, dropout=dropout)
+                                          d_model=opt.d_model, d_ff=opt.d_ff, h=opt.H, dropout=dropout)
         else:
             # Load model
             file_name = os.path.join(self.save_path, f'checkpoint_switch_source_target/model_{opt.starting_epoch-1}.pt')
@@ -169,7 +169,7 @@ class TransformerTrainer(BaseTrainer):
             'd_model': opt.d_model,
             'd_ff': opt.d_ff,
             'H': opt.H,
-            'dropout': opt.dropout
+            'dropout': trial.params.dropout
         }
 
     def save(self, model, optim, epoch, vocab_size, opt):
