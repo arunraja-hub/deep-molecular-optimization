@@ -27,8 +27,8 @@ if __name__ == "__main__":
     #         trainer.train(opt=opt,trial=trial)
 
     study = optuna.create_study(study_name="train_model-switch-source-target", direction="maximize", 
-        pruner=optuna.pruners.MedianPruner(n_startup_trials=5, n_warmup_steps=30, interval_steps=10))
-    study.optimize(objective, n_trials=10)
+        pruner=optuna.pruners.MedianPruner(n_startup_trials=2, n_warmup_steps=30, interval_steps=10))
+    study.optimize(objective, n_trials=5)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
     complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
