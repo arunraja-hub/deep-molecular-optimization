@@ -1,5 +1,6 @@
 import logging
 import tqdm
+import sys
 
 import utils.file as uf
 
@@ -28,4 +29,4 @@ def get_logger(name, log_path, level=logging.INFO):
 
 
 def progress_bar(iterable, total, **kwargs):
-    return tqdm.tqdm(iterable=iterable, total=total, ascii=True, **kwargs)
+    return tqdm.tqdm(iterable=iterable, total=total, file=sys.stdout, ascii=True, **kwargs)
