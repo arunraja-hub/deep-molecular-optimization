@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J molopt-switch
-#SBATCH --time=48:00:00
+#SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
