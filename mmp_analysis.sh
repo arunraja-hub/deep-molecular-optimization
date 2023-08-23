@@ -30,10 +30,10 @@ done
 source activate molopt
 echo $CONDA_DEFAULT_ENV
 echo "Between starting molecules and all the generated molecules"
-python mmp_analysis.py --data-path experiments/evaluation_transformer/test/evaluation_60/generated_molecules_prop.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/
-python mmp_analysis.py --data-path experiments/evaluation_transformer/test_not_in_train/evaluation_60/generated_molecules_prop.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/
-python mmp_analysis.py --data-path experiments/evaluation_transformer/test_unseen_L-1_S01_C10_range/evaluation_60/generated_molecules_prop.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/
+python mmp_analysis.py --data-path experiments/evaluation_transformer/test/evaluation_30/generated_molecules_prop.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/
+python mmp_analysis.py --data-path experiments/evaluation_transformer/test_not_in_train/evaluation_30/generated_molecules_prop.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/
+python mmp_analysis.py --data-path experiments/evaluation_transformer/test_unseen_L-1_S01_C10_range/evaluation_30/generated_molecules_prop.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/
 echo "Between starting molecules and all the generated molecules with desirable properties"
-python mmp_analysis.py --data-path experiments/evaluation_transformer/test/evaluation_60/generated_molecules_prop_statistics.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/ --only-desirable
-python mmp_analysis.py --data-path experiments/evaluation_transformer/test_not_in_train/evaluation_60/generated_molecules_prop_statistics.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/ --only-desirable
-python mmp_analysis.py --data-path experiments/evaluation_transformer/test_unseen_L-1_S01_C10_range/evaluation_60/generated_molecules_prop_statistics.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/ --only-desirable
+python mmp_analysis.py --data-path experiments/evaluation_transformer/test/evaluation_30/generated_molecules_prop_statistics.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/ --only-desirable
+python mmp_analysis.py --data-path experiments/evaluation_transformer/test_not_in_train/evaluation_30/generated_molecules_prop_statistics.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/ --only-desirable
+python mmp_analysis.py --data-path experiments/evaluation_transformer/test_unseen_L-1_S01_C10_range/evaluation_30/generated_molecules_prop_statistics.csv --train-path data/chembl_02/train.csv --mmpdb-path path/mmpdb/ --only-desirable
