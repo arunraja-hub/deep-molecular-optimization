@@ -99,7 +99,7 @@ class GenerateRunner():
         for i in range(opt.num_samples):
             data_sorted['Predicted_smi_{}'.format(i + 1)] = sampled_smiles_list[:, i]
 
-        result_path = os.path.join(self.save_path, "generated_molecules_", 'epoch_{opt.epoch}', ".csv")
+        result_path = os.path.join(self.save_path, "generated_molecules_epoch{}.csv".format(opt.epoch))
         LOG.info("Save to {}".format(result_path))
         data_sorted.to_csv(result_path, index=False)
 
