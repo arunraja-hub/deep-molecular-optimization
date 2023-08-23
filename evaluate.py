@@ -72,7 +72,7 @@ class EvaluationRunner:
 
         plus_minus_change = [cfgd.PROPERTY_ERROR['LogD']]
         is_inrange_sum_diffrange = []
-        soruce_property = self.data['Source_Mol_{}'.format(property_name)].tolist()
+        source_property = self.data['Source_Mol_{}'.format(property_name)].tolist()
         delta_property = self.data['Delta_{}_ori'.format(property_name)].tolist()
         range_evaluation_pool = [self.range_evaluation] * len(self.data)
         for flu in plus_minus_change:  # for each fluctuation
@@ -80,7 +80,7 @@ class EvaluationRunner:
             is_inrange_sum = np.zeros(len(self.data))
             for i in range(self.num_samples):
                 pred_logD = self.data['Predict_smi_{}_c{}'.format(i + 1, property_name)].tolist()
-                zipped = list(zip(pred_logD, soruce_property, delta_property, range_list, range_evaluation_pool))
+                zipped = list(zip(pred_logD, source_property, delta_property, range_list, range_evaluation_pool))
                 with Pool(NUM_WORKERS) as p:
                     is_inrange = np.asarray(p.map(is_inrange_pool, zipped))
                 is_inrange_sum += is_inrange

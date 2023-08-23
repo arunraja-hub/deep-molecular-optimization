@@ -46,9 +46,9 @@ class GenerateRunner():
         :return:
         """
 
-        # Read test
+        # Load test file
         data = pd.read_csv(os.path.join(opt.data_path, test_file + '.csv'), sep=",")
-        dataset = md.Dataset(data=data, vocabulary=vocab, tokenizer=self.tokenizer, prediction_mode=True)
+        dataset = md.Dataset(data=data, vocabulary=vocab, tokenizer=self.tokenizer, prediction_mode=True) #prediction_mode=True because only the source moleculaes have to be tokenised
         dataloader = torch.utils.data.DataLoader(dataset, opt.batch_size,
                                                  shuffle=False, collate_fn=md.Dataset.collate_fn)
         return dataloader
@@ -99,7 +99,7 @@ class GenerateRunner():
         for i in range(opt.num_samples):
             data_sorted['Predicted_smi_{}'.format(i + 1)] = sampled_smiles_list[:, i]
 
-        result_path = os.path.join(self.save_path, "generated_molecules.csv")
+        result_path = os.path.join(self.save_path, "generated_molecules_", 'epoch_{opt.epoch}', ".csv")
         LOG.info("Save to {}".format(result_path))
         data_sorted.to_csv(result_path, index=False)
 
