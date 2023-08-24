@@ -23,7 +23,7 @@ def get_plot_sample(df_predictions,prop_sep, nr_of_source_mol=50, range_evaluati
     )
 
     # Get legends
-    legends = _get_legends(df_predictions, molecules, all_tuples_mol, sampled_index, range_evaluation)
+    legends = _get_legends(df_predictions, molecules, all_tuples_mol, sampled_index, range_evaluation, prop_sep)
 
     img = Draw.MolsToGridImage(
         molecules,
@@ -324,7 +324,7 @@ def _add_generated_mol_text(img, i):
     return img
 
 
-def _get_legends(predictions, molecules, all_gen_mols, sampled_indices, range_evaluation):
+def _get_legends(predictions, molecules, all_gen_mols, sampled_indices, range_evaluation, prop_sep):
 
     legends = []
     for i in range(len(molecules) // (NUM_SAMPLES + 2)):
@@ -352,9 +352,10 @@ def _get_legends(predictions, molecules, all_gen_mols, sampled_indices, range_ev
         # Add generated molecules
         for j in range(NUM_SAMPLES):
             index = all_gen_mols[i][j][-2]
-            legends.append(
-                f"[LogD: {row['Predict_smi_' + str(index) + '_cLogD']:.2f}   Sol: {row['Predict_smi_' + str(index) + '_cSolubility']:.2f}  Clint: {row['Predict_smi_' + str(index) + '_cClint']:.2f}]"
-            )
+            if prop_sep == True:
+                legends.append(
+                    f"[LogD: {row['Predict_smi_' + str(index) + '_cLogD']:.2f}   Sol: {row['Predict_smi_' + str(index) + '_cSolubility']:.2f}  Clint: {row['Predict_smi_' + str(index) + '_cClint']:.2f}]"
+                )
     return legends
 
 
