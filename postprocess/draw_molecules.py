@@ -356,6 +356,11 @@ def _get_legends(predictions, molecules, all_gen_mols, sampled_indices, range_ev
                 legends.append(
                     f"[LogD: {row['Predict_smi_' + str(index) + '_cLogD']:.2f}   Sol: {row['Predict_smi_' + str(index) + '_cSolubility']:.2f}  Clint: {row['Predict_smi_' + str(index) + '_cClint']:.2f}]"
                 )
+            else:
+                legends.append(
+                    f"[LogD: {None}   Sol: {None}  Clint: {None}]"
+                )
+
     return legends
 
 
