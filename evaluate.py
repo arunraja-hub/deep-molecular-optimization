@@ -37,7 +37,7 @@ class EvaluationRunner:
         uf.make_directory(self.output_path)
 
 
-    def evaluation_statistics(self, prop_sep = True):
+    def evaluation_statistics(self, prop_sep):
 
         if prop_sep == True:
             # Look at properties separately
@@ -54,7 +54,7 @@ class EvaluationRunner:
 
         # Draw molecules
         LOG.info("Drawing molecules")
-        image = draw_molecules.get_plot_sample(self.data, nr_of_source_mol=50, range_evaluation=self.range_evaluation)
+        image = draw_molecules.get_plot_sample(self.data, prop_sep, nr_of_source_mol=50, range_evaluation=self.range_evaluation)
         image.save(os.path.join(self.output_path, 'draw_molecules.png'), format='png')
 
     def property_stat(self):
