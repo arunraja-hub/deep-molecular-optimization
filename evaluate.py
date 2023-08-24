@@ -39,11 +39,11 @@ class EvaluationRunner:
 
     def evaluation_statistics(self, prop_sep = True):
 
-        # Look at properties separately
         if prop_sep == True:
+            # Look at properties separately
             self.property_stat()
-        # Satisfying multiple properties
-        self.property_overview_stat()
+            # Satisfying multiple properties
+            self.property_overview_stat()
 
         # Compute Tanimoto similarity
         self.compute_similarity()
