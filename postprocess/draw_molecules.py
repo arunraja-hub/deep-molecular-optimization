@@ -13,13 +13,13 @@ MOLS_PER_ROW = 6
 NUM_SAMPLES = 10
 
 
-def get_plot_sample(df_predictions, nr_of_source_mol=50, range_evaluation=""):
+def get_plot_sample(df_predictions, nr_of_source_mol=50, range_evaluation="", prop_sep):
     # Sample random indices
     random.seed(SEED)
     nr_of_source_mol = min(nr_of_source_mol, len((df_predictions)))
     sampled_index = random.sample(list(range(len(df_predictions))), nr_of_source_mol)
     molecules, green_boxes, red_boxes, all_tuples_mol, matches_list = _create_boxes_and_molecules(
-        df_predictions, sampled_index, nr_of_source_mol
+        df_predictions, sampled_index, nr_of_source_mol, prop_sep
     )
 
     # Get legends
@@ -358,7 +358,7 @@ def _get_legends(predictions, molecules, all_gen_mols, sampled_indices, range_ev
     return legends
 
 
-def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
+def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol, prop_sep):
     # This function calculates how many green-boxes and red-boxes (and their type) to add to each batch of generated molecules.
     # Initiate arrays to store data in
     green_boxes = np.zeros(nr_of_source_mol)
@@ -391,27 +391,28 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
             if row["Predicted_smi_" + str(j)] == 0:
                 generated_mols.append("NOSMILE")
             else:
-                not_satisfy = 1-row['Predict_eval_{}_{}_{}'.format(j, 'LogD', cfgd.PROPERTY_ERROR['LogD'])]
+                if prop_sep == True:
+                    not_satisfy = 1-row['Predict_eval_{}_{}_{}'.format(j, 'LogD', cfgd.PROPERTY_ERROR['LogD'])]
 
-                save_info = (not_satisfy, row['num_correct_allprop_sumoversample_allerror'])
+                    save_info = (not_satisfy, row['num_correct_allprop_sumoversample_allerror'])
 
-                solubility_bool = row['Predict_eval_{}_{}_{}'.format(j, 'Solubility', cfgd.PROPERTY_ERROR['Solubility'])]
-                clint_bool = row['Predict_eval_{}_{}_{}'.format(j, 'Clint', cfgd.PROPERTY_ERROR['Clint'])]
+                    solubility_bool = row['Predict_eval_{}_{}_{}'.format(j, 'Solubility', cfgd.PROPERTY_ERROR['Solubility'])]
+                    clint_bool = row['Predict_eval_{}_{}_{}'.format(j, 'Clint', cfgd.PROPERTY_ERROR['Clint'])]
 
-                if solubility_bool and clint_bool:
-                    option = 0
-                    green_boxes[i] = green_boxes[i] + 1
+                    if solubility_bool and clint_bool:
+                        option = 0
+                        green_boxes[i] = green_boxes[i] + 1
 
-                elif solubility_bool and not clint_bool:
-                    option = 1
-                    red_boxes[i, 0] = red_boxes[i, 0] + 1
+                    elif solubility_bool and not clint_bool:
+                        option = 1
+                        red_boxes[i, 0] = red_boxes[i, 0] + 1
 
-                elif not solubility_bool and clint_bool:
-                    option = 2
-                    red_boxes[i, 1] = red_boxes[i, 1] + 1
-                else:
-                    option = 3
-                    red_boxes[i, 2] = red_boxes[i, 2] + 1
+                    elif not solubility_bool and clint_bool:
+                        option = 2
+                        red_boxes[i, 1] = red_boxes[i, 1] + 1
+                    else:
+                        option = 3
+                        red_boxes[i, 2] = red_boxes[i, 2] + 1
 
                 # find maximum common structure
                 mols = [Chem.MolFromSmiles(row["Source_Mol"])]
