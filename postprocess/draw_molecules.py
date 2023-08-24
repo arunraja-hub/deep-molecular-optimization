@@ -448,5 +448,5 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol, 
 
     # Create array with all smiles to plot in correct order
     molecules = [Chem.MolFromSmiles(str(smile)) for smile in smiles]
-
+    breakpoint()
     return molecules, green_boxes, red_boxes, all_gen_mols, matches_all
