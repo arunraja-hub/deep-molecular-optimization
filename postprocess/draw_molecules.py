@@ -13,7 +13,7 @@ MOLS_PER_ROW = 6
 NUM_SAMPLES = 10
 
 
-def get_plot_sample(df_predictions, nr_of_source_mol=50, range_evaluation="", prop_sep = True):
+def get_plot_sample(df_predictions,prop_sep, nr_of_source_mol=50, range_evaluation=""):
     # Sample random indices
     random.seed(SEED)
     nr_of_source_mol = min(nr_of_source_mol, len((df_predictions)))
