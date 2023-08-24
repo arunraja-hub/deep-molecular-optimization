@@ -391,6 +391,7 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol, 
             if row["Predicted_smi_" + str(j)] == 0:
                 generated_mols.append("NOSMILE")
             else:
+                save_info = (0,0)
                 if prop_sep == True:
                     not_satisfy = 1-row['Predict_eval_{}_{}_{}'.format(j, 'LogD', cfgd.PROPERTY_ERROR['LogD'])]
 
