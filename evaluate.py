@@ -37,10 +37,11 @@ class EvaluationRunner:
         uf.make_directory(self.output_path)
 
 
-    def evaluation_statistics(self):
+    def evaluation_statistics(self, prop_sep = True):
 
         # Look at properties separately
-        self.property_stat()
+        if prop_sep == True:
+            self.property_stat()
         # Satisfying multiple properties
         self.property_overview_stat()
 
@@ -329,7 +330,7 @@ def run_main():
     opt = parser.parse_args()
 
     runner = EvaluationRunner(opt.data_path, opt.num_samples, opt.range_evaluation)
-    runner.evaluation_statistics()
+    runner.evaluation_statistics(prop_sep = False)
 
 if __name__ == "__main__":
     run_main()
