@@ -39,6 +39,8 @@ class EvaluationRunner:
 
     def evaluation_statistics(self, prop_sep):
 
+        print("prop_sep", prop_sep)
+
         if prop_sep == True:
             # Look at properties separately
             self.property_stat()
