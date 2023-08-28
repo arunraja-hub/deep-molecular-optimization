@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH -J generate-molopt
+#SBATCH -J molopt
 #SBATCH --time=48:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
 #SBATCH --gpus-per-task=1
-#SBATCH --cpus-per-gpu=1
-#SBATCH --mem-per-cpu=12000
+#SBATCH --cpus-per-gpu=4
+#SBATCH --mem-per-cpu=3000
 #S BATCH --exclusive
 #SBATCH --chdir=/vols/opig/users/raja/deep-molecular-optimization
 #SBATCH --mail-user=arun.raja@dtc.ox.ac.uk
