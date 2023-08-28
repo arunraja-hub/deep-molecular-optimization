@@ -1,24 +1,24 @@
 #!/bin/bash
 #SBATCH -J molopt
-#SBATCH --time=48:00:00
+#SBATCH --time=96:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
 #SBATCH --gpus-per-task=1
 #SBATCH --cpus-per-gpu=4
-#SBATCH --mem-per-cpu=3000
+#SBATCH --mem-per-cpu=36000
 #S BATCH --exclusive
-#SBATCH --chdir=/vols/opig/users/raja/deep-molecular-optimization
+#SBATCH --chdir=/home/shil5919/opig/deep-molecular-optimization
 #SBATCH --mail-user=arun.raja@dtc.ox.ac.uk
 #SBATCH --mail-type=ALL
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
-#SBATCH --partition=high-opig-gpu
-#SBATCH --clusters=srf_gpu_01
-#SBATCH --partition=high-opig-test
-#SBATCH -w nagagpu04.cpu.stats.ox.ac.uk
-#SBATCH --output=/vols/opig/users/raja/molopt_slurm/slurm_%j.out                             
-#SBATCH --error=/vols/opig/users/raja/molopt_slurm/slurm_%j.err
+#S BATCH --partition=high-opig-gpu
+#SBATCH --qos=standard
+#S BATCH --partition=high-opig-test
+#S BATCH -w nagagpu04.cpu.stats.ox.ac.uk
+#SBATCH --output=/home/shil5919/opig/slurm_molopt/slurm_%j.out
+#SBATCH --error=/home/shil5919/opig/slurm_molopt/slurm_%j.err
 echo $CUDA_VISIBLE_DEVICES 
 echo $CONDA_DEFAULT_ENV
 for dir in */; do
