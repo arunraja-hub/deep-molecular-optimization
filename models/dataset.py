@@ -15,6 +15,8 @@ from models.transformer.module.subsequent_mask import subsequent_mask
 import datamol as dm
 from molfeat.trans.pretrained import GraphormerTransformer
 
+import numpy as np
+
 class Dataset(tud.Dataset):
     """Custom PyTorch Dataset that takes a file containing
     Source_Mol_ID,Target_Mol_ID,Source_Mol,Target_Mol,
@@ -59,7 +61,7 @@ class Dataset(tud.Dataset):
         transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float)
 
         source_tokens.extend(transformer(source_smi))
-        source_encoded = numpy.array(list(self._vocabulary.encode(source_tokens[:3])) + list(transformer(source_smi)))
+        source_encoded = np.array(list(self._vocabulary.encode(source_tokens[:3])) + list(transformer(source_smi)))
         # self._vocabulary.encode(source_tokens)
 
         # tokenize and encode target smiles if it is for training instead of evaluation
