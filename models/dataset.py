@@ -17,6 +17,9 @@ from molfeat.trans.pretrained import GraphormerTransformer
 
 import numpy as np
 
+import os
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:<512>"
+
 class Dataset(tud.Dataset):
     """Custom PyTorch Dataset that takes a file containing
     Source_Mol_ID,Target_Mol_ID,Source_Mol,Target_Mol,
