@@ -56,7 +56,7 @@ class Dataset(tud.Dataset):
                 change = row['Delta_{}'.format(property_name)]
                 source_tokens.append(f"{property_name}_{change}")
 
-        transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float32)
+        transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float)
 
         source_tokens.extend(transformer(source_smi))
         breakpoint()
