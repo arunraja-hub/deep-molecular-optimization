@@ -30,4 +30,4 @@ done
 conda activate molfeat
 echo $CONDA_DEFAULT_ENV
 echo "training"
-python train.py --data-path data/chembl_02 --save-directory train_transformer_molopt_original --model-choice transformer --num-epoch 30 transformer
+python train.py --batch-size 16 --data-path data/chembl_02 --save-directory train_transformer_molopt_original --model-choice transformer --num-epoch 30 transformer
