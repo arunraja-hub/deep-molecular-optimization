@@ -56,11 +56,12 @@ class Dataset(tud.Dataset):
                 change = row['Delta_{}'.format(property_name)]
                 source_tokens.append(f"{property_name}_{change}")
 
-        transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float)
+        transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float32)
 
         source_tokens.extend(transformer(source_smi))
         breakpoint()
-        source_encoded = source_tokens
+        source_encoded = numpy.array(list(self._vocabulary.encode(source_tokens[:3])) + list(transformer(source_smi)))
+        breakpoint()
         # self._vocabulary.encode(source_tokens)
 
         # tokenize and encode target smiles if it is for training instead of evaluation
