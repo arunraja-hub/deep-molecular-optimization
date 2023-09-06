@@ -59,6 +59,7 @@ class Dataset(tud.Dataset):
         transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float)
 
         source_tokens.extend(transformer(source_smi))
+        breakpoint()
         source_encoded = source_tokens
         # self._vocabulary.encode(source_tokens)
 
