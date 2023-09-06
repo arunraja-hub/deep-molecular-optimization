@@ -12,6 +12,9 @@ from torch.autograd import Variable
 import configuration.config_default as cfgd
 from models.transformer.module.subsequent_mask import subsequent_mask
 
+import datamol as dm
+from molfeat.trans.pretrained import GraphormerTransformer
+
 class Dataset(tud.Dataset):
     """Custom PyTorch Dataset that takes a file containing
     Source_Mol_ID,Target_Mol_ID,Source_Mol,Target_Mol,
@@ -53,8 +56,11 @@ class Dataset(tud.Dataset):
                 change = row['Delta_{}'.format(property_name)]
                 source_tokens.append(f"{property_name}_{change}")
 
-        source_tokens.extend(self._tokenizer.tokenize(source_smi))
-        source_encoded = self._vocabulary.encode(source_tokens)
+        transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float)
+
+        source_tokens.extend(transformer(source_smi))
+        source_encoded = source_tokens
+        # self._vocabulary.encode(source_tokens)
 
         # tokenize and encode target smiles if it is for training instead of evaluation
         if not self._prediction_mode:
