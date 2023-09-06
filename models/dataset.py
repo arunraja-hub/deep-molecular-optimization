@@ -59,9 +59,7 @@ class Dataset(tud.Dataset):
         transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float)
 
         source_tokens.extend(transformer(source_smi))
-        breakpoint()
         source_encoded = numpy.array(list(self._vocabulary.encode(source_tokens[:3])) + list(transformer(source_smi)))
-        breakpoint()
         # self._vocabulary.encode(source_tokens)
 
         # tokenize and encode target smiles if it is for training instead of evaluation
