@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J molopt
+#SBATCH -J molopt-dist
 #SBATCH --time=96:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
