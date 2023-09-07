@@ -3,7 +3,7 @@
 #SBATCH --time=96:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:3
 #SBATCH --gpus-per-task=3
 #SBATCH --cpus-per-gpu=4
 #SBATCH --mem-per-cpu=24000
