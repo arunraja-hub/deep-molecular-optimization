@@ -16,6 +16,13 @@ if __name__ == "__main__":
     opts.train_opts(parser)
     opt = parser.parse_args()
 
+    world_size = 3    
+    mp.spawn(
+        main,
+        args=(world_size),
+        nprocs=world_size
+    )
+
     if opt.model_choice == 'transformer':
         def objective(trial):
             trainer = TransformerTrainer(opt)

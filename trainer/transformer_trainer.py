@@ -5,7 +5,7 @@ import configuration.opts as opts
 
 
 import torch
-from torch import nn
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 torch.cuda.empty_cache()
 
@@ -28,13 +28,26 @@ import utils.log as ul
 import optuna
 from optuna.trial import TrialState
 
+import torch.distributed as dist
+from torch.utils.data.distributed import DistributedSampler
+
+
+def setup(rank, world_size):
+    os.environ['MASTER_ADDR'] = 'localhost'
+    os.environ['MASTER_PORT'] = '12355'
+    dist.init_process_group("nccl", rank=rank, world_size=world_size)
+
 
 class TransformerTrainer(BaseTrainer):
 
     def __init__(self, opt):
         super().__init__(opt)
 
-    def get_model(self, opt, vocab, device, trial):
+    def get_model(self, opt, vocab, device, trial, rank, world_size):
+
+        # setup the process groups
+        setup(rank, world_size)
+
         vocab_size = len(vocab.tokens())
 
         LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'tensorboard-original-source2target-with-optuna.log'))
@@ -56,12 +69,15 @@ class TransformerTrainer(BaseTrainer):
             file_name = os.path.join(self.save_path, f'checkpoint_original_source2target/model_{opt.starting_epoch-1}.pt')
             model= EncoderDecoder.load_from_file(file_name)
         
-        if torch.cuda.device_count() > 1:
-            print("Let's use", torch.cuda.device_count(), "GPUs!")
-            # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-            model = nn.DataParallel(model)
-        # move to GPU
-        model.to(device)
+        # if torch.cuda.device_count() > 1:
+        #     print("Let's use", torch.cuda.device_count(), "GPUs!")
+        #     # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
+        #     model = nn.DataParallel(model)
+        # # move to GPU
+        # model.to(device)
+        model = model().to(rank)
+        model = DDP(model, device_ids=[rank], output_device=rank, find_unused_parameters=True)
+
         return model
 
     def _initialize_optimizer(self, model, opt):
@@ -196,15 +212,18 @@ class TransformerTrainer(BaseTrainer):
 
         torch.save(save_dict, file_name)
 
-    def train(self, opt, trial):
+    def train(self, opt, trial, rank, world_size):
+
+        setup(rank, world_size)
+
         # Load vocabulary
         with open(os.path.join(opt.data_path, 'vocab.pkl'), "rb") as input_file:
             vocab = pkl.load(input_file)
         vocab_size = len(vocab.tokens())
 
         # Data loader
-        dataloader_train = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'train')
-        dataloader_validation = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'validation')
+        dataloader_train = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'train', rank, world_size)
+        dataloader_validation = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'validation', rank, world_size)
 
         device = ut.allocate_gpu()
 
@@ -216,6 +235,7 @@ class TransformerTrainer(BaseTrainer):
 
         # Train epoch
         for epoch in range(opt.starting_epoch, opt.starting_epoch + opt.num_epoch):
+            dataloader_train.sampler.set_epoch(epoch)       
             self.LOG.info("Starting EPOCH #%d", epoch)
 
             self.LOG.info("Training start")

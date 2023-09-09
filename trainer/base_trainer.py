@@ -9,6 +9,9 @@ import utils.log as ul
 import models.dataset as md
 import preprocess.vocabulary as mv
 
+from torch.utils.data.distributed import DistributedSampler
+
+
 
 class BaseTrainer(ABC):
 
@@ -20,12 +23,14 @@ class BaseTrainer(ABC):
         # self.LOG = LOG
         # self.LOG.info(opt)
 
-    def initialize_dataloader(self, data_path, batch_size, vocab, data_type):
+    def initialize_dataloader(self, data_path, batch_size, vocab, data_type, rank, world_size, pin_memory=False, num_workers=0):
         # Read train or validation
         data = pd.read_csv(os.path.join(data_path, data_type + '.csv'), sep=",")
         dataset = md.Dataset(data=data, vocabulary=vocab, tokenizer=mv.SMILESTokenizer(), prediction_mode=False)
+        sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=False, drop_last=False)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size,
-                                                 shuffle=True, collate_fn=md.Dataset.collate_fn)
+                                                 shuffle=False, collate_fn=md.Dataset.collate_fn,
+                                                 pin_memory=pin_memory, num_workers=num_workers, drop_last=False, sampler=sampler)
         return dataloader
 
     def to_tensorboard(self, train_loss, validation_loss, accuracy, epoch):
