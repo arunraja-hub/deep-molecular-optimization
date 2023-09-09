@@ -53,6 +53,11 @@ class TransformerTrainer(BaseTrainer):
             # Load model
             file_name = os.path.join(self.save_path, f'checkpoint_original_source2target/model_{opt.starting_epoch-1}.pt')
             model= EncoderDecoder.load_from_file(file_name)
+        
+        if torch.cuda.device_count() > 1:
+            print("Let's use", torch.cuda.device_count(), "GPUs!")
+            # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
+            model = nn.DataParallel(model)
         # move to GPU
         model.to(device)
         return model
