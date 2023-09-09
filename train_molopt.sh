@@ -1,10 +1,11 @@
 #!/bin/bash
-#SBATCH -J molopt-no-optuna
-#SBATCH --time=96:00:00
+#SBATCH -J pcqm4mv2_graphormer_base
+#SBATCH --time=1:00:00
+#SBATCH --partition=short
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gres=gpu:2
-#SBATCH --gpus-per-task=2
+#SBATCH --gres=gpu:3
+#SBATCH --gpus-per-task=3
 #SBATCH --cpus-per-gpu=4
 #SBATCH --mem-per-cpu=36000
 #S BATCH --exclusive
@@ -34,4 +35,4 @@ pip install molfeat[graphormer]
 pip install numpy
 echo $CONDA_DEFAULT_ENV
 echo "training"
-python train.py --data-path data/chembl_02 --save-directory train_transformer_molopt_original --model-choice transformer --num-epoch 30 transformer
+python train.py --batch-size 96 --data-path data/chembl_02 --save-directory pcqm4mv2_graphormer_base --model-choice transformer --num-epoch 30 transformer

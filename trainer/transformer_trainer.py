@@ -5,6 +5,8 @@ import configuration.opts as opts
 
 
 import torch
+from torch import nn
+
 torch.cuda.empty_cache()
 
 
@@ -63,8 +65,8 @@ class TransformerTrainer(BaseTrainer):
         return model
 
     def _initialize_optimizer(self, model, opt):
-        optim = moptim(model.src_embed[0].d_model, opt.factor, opt.warmup_steps,
-                       torch.optim.Adam(model.parameters(), lr=0, betas=(opt.adam_beta1, opt.adam_beta2),
+        optim = moptim(model.module.src_embed[0].d_model, opt.factor, opt.warmup_steps,
+                       torch.optim.Adam(model.module.parameters(), lr=0, betas=(opt.adam_beta1, opt.adam_beta2),
                                         eps=opt.adam_eps))
         return optim
 
@@ -73,7 +75,7 @@ class TransformerTrainer(BaseTrainer):
         checkpoint = torch.load(file_name, map_location='cuda:0')
         optim_dict = checkpoint['optimizer_state_dict']
         optim = moptim(optim_dict['model_size'], optim_dict['factor'], optim_dict['warmup'],
-                       torch.optim.Adam(model.parameters(), lr=0))
+                       torch.optim.Adam(model.module.parameters(), lr=0))
         optim.load_state_dict(optim_dict)
         return optim
 
@@ -221,7 +223,7 @@ class TransformerTrainer(BaseTrainer):
             loss_epoch_train = self.train_epoch(dataloader_train,
                                                        model,
                                                        SimpleLossCompute(
-                                                                 model.generator,
+                                                                 model.module.generator,
                                                                  criterion,
                                                                  optim), device)
 
@@ -234,7 +236,7 @@ class TransformerTrainer(BaseTrainer):
                 dataloader_validation,
                 model,
                 SimpleLossCompute(
-                    model.generator, criterion, None),
+                    model.module.generator, criterion, None),
                 device, vocab)
             
             print('optuna trial.report(accuracy, step= epoch)')
