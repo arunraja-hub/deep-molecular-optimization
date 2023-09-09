@@ -1,10 +1,11 @@
 #!/bin/bash
-#SBATCH -J molopt-no-optuna
-#SBATCH --time=96:00:00
+#SBATCH -J gpt2-dist
+#SBATCH --time=1:00:00
+#SBATCH --partition=short
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gres=gpu:2
-#SBATCH --gpus-per-task=2
+#SBATCH --gres=gpu:3
+#SBATCH --gpus-per-task=3
 #SBATCH --cpus-per-gpu=4
 #SBATCH --mem-per-cpu=36000
 #S BATCH --exclusive
