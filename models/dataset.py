@@ -13,7 +13,7 @@ import configuration.config_default as cfgd
 from models.transformer.module.subsequent_mask import subsequent_mask
 
 import datamol as dm
-from molfeat.trans.pretrained import GraphormerTransformer
+from molfeat.trans.pretrained.hf_transformers import PretrainedHFTransformer
 
 import numpy as np
 
@@ -61,7 +61,7 @@ class Dataset(tud.Dataset):
                 change = row['Delta_{}'.format(property_name)]
                 source_tokens.append(f"{property_name}_{change}")
 
-        transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float)
+        transformer = PretrainedHFTransformer(kind='GPT2-Zinc480M-87M', notation='smiles', dtype=float)
 
         source_tokens.extend(transformer(source_smi))
         source_encoded = np.concatenate((self._vocabulary.encode(source_tokens[:3]), np.squeeze(transformer(source_smi).T)))
