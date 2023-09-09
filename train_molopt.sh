@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J gpt2-dist
+#SBATCH -J roberta-zinc-dist
 #SBATCH --time=1:00:00
 #SBATCH --partition=short
 #SBATCH --nodes=1

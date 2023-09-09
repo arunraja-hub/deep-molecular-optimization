@@ -61,7 +61,7 @@ class Dataset(tud.Dataset):
                 change = row['Delta_{}'.format(property_name)]
                 source_tokens.append(f"{property_name}_{change}")
 
-        transformer = PretrainedHFTransformer(kind='GPT2-Zinc480M-87M', notation='smiles', dtype=float)
+        transformer = PretrainedHFTransformer(kind='Roberta-Zinc480M-102M', notation='smiles', dtype=float)
 
         source_tokens.extend(transformer(source_smi))
         source_encoded = np.concatenate((self._vocabulary.encode(source_tokens[:3]), np.squeeze(transformer(source_smi).T)))
