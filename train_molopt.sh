@@ -31,6 +31,7 @@ module load Anaconda3/2022.10
 conda activate /data/stat-cadd/shil5919/molfeat
 pip3 install torch torchvision torchaudio
 pip install molfeat[graphormer]
+pip install molfeat[transformer]
 pip install numpy
 echo $CONDA_DEFAULT_ENV
 echo "training"
