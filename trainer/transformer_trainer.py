@@ -47,19 +47,20 @@ from datetime import datetime, timedelta
 
 def setup(rank, world_size, free_port, dist_url):
     # print('os.environ[SLURM_LAUNCH_NODE_IPADDR]',os.environ['SLURM_LAUNCH_NODE_IPADDR'])
-    os.environ['MASTER_ADDR'] = '169.254.1.2'
+    # os.environ['MASTER_ADDR'] = '169.254.1.2'
 
     # "$(scontrol show job $SLURM_JOBID | awk -F= '/BatchHost/ {print $2}')"
     # "$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)"
     # '127.0.0.1'
-    os.environ['MASTER_PORT'] = free_port
+    # os.environ['MASTER_PORT'] = free_port
     print('setup-', os.environ['MASTER_PORT'],  os.environ['MASTER_ADD'])
     #  , os.environ['SLURM_LAUNCH_NODE_IPADDR'])
     os.environ['NCCL_DEBUG'] ='INFO'
-    os.environ['NCCL_SOCKET_IFNAME'] = 'eth0'
+    # os.environ['NCCL_SOCKET_IFNAME'] = 'eth'
+    # os.environ['GLOO_SOCKET_IFNAME'] = 'eth0'
     os.environ["TORCH_CPP_LOG_LEVEL"]="INFO"
     os.environ["TORCH_DISTRIBUTED_DEBUG"] = "DETAIL"
-    dist.init_process_group("nccl",  world_size=world_size, rank=rank, timeout=timedelta(seconds=20))
+    dist.init_process_group("nccl",world_size=world_size, rank=rank, timeout=timedelta(minutes=5))
     # init_method = 'env://',
     print('init_process_group done')
     # , world_size=world_size, rank=rank)
@@ -105,7 +106,7 @@ class TransformerTrainer(BaseTrainer):
         #     model = nn.DataParallel(model)
         # # move to GPU
         # model.to(device)
-        model = model().to(rank)
+        # model = model().to(rank)
         model = DDP(model, device_ids=[rank], output_device=rank)
         # , find_unused_parameters=True)
 
@@ -254,6 +255,7 @@ class TransformerTrainer(BaseTrainer):
 
         print("args--",rank, world_size, free_port)
         # Load vocabulary
+        print('opt-',opt)
         with open(os.path.join(opt.data_path, 'vocab.pkl'), "rb") as input_file:
             vocab = pkl.load(input_file)
         vocab_size = len(vocab.tokens())
@@ -263,8 +265,9 @@ class TransformerTrainer(BaseTrainer):
         dataloader_validation = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'validation', rank, world_size)
 
         device = ut.allocate_gpu()
+        print('device', device)
 
-        model = self.get_model(opt, vocab, device)
+        model = self.get_model(opt, vocab, device, rank, world_size)
         optim = self.get_optimization(model, opt)
 
         pad_idx = cfgd.DATA_DEFAULT['padding_value']
@@ -312,6 +315,6 @@ class TransformerTrainer(BaseTrainer):
 
             self.to_tensorboard(loss_epoch_train, loss_epoch_validation, accuracy, epoch)
         
-        cleanup()
+        # cleanup()
 
         return loss_epoch_train, loss_epoch_validation, accuracy

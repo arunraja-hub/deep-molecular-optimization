@@ -2,7 +2,7 @@ import argparse
 
 import configuration.opts as opts
 from trainer.transformer_trainer import TransformerTrainer
-from trainer.seq2seq_trainer import Seq2SeqTrainer
+# from trainer.seq2seq_trainer import Seq2SeqTrainer
 
 
 import optuna
@@ -27,6 +27,7 @@ def find_free_port():
         return sockname
 
 if __name__ == "__main__":
+    print('main')
     parser = argparse.ArgumentParser(
         description='train.py',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -36,8 +37,8 @@ if __name__ == "__main__":
 
     if opt.model_choice == 'transformer':
         trainer = TransformerTrainer(opt)
-    elif opt.model_choice == 'seq2seq':
-        trainer = Seq2SeqTrainer(opt)
+    # elif opt.model_choice == 'seq2seq':
+    #     trainer = Seq2SeqTrainer(opt)
 
     
     # torch.cuda.set_device(opt.local_rank)
@@ -52,14 +53,16 @@ if __name__ == "__main__":
     # print( 'args in train',int(os.environ["WORLD_SIZE"]),int(os.environ['SLURM_PROCID']), int(os.environ['LOCAL_RANK']))
 
 
-    free_port = '12346'
+    free_port = '12347'
     # find_free_port()
 
-    dist_url = f'tcp://10.137.21.55:{free_port}'
+    dist_url = ''
+    #  f'tcp://10.140.21.19:{free_port}'
 
+    print('spawn')
     mp.spawn(
-        trainer.train,
-        args=(rank,world_size,free_port,dist_url),
+        trainer.train(opt,rank,world_size,free_port,dist_url),
+        args=(),
         nprocs=world_size
     )
 
