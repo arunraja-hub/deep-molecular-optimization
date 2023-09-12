@@ -1,12 +1,15 @@
 """ Implementation of all available options """
 from __future__ import print_function
-
+import os
 
 def train_opts(parser):
     # Transformer or Seq2Seq
     parser.add_argument('--model-choice', required=True, help="transformer or seq2seq")
     # Common training options
     group = parser.add_argument_group('Training_options')
+    group.add_argument('--local-rank', type=int, default=0,
+                       help='rank')
+                    #    int(os.environ['LOCAL_RANK'])
     group.add_argument('--batch-size', type=int, default=32,
                        help='Batch size for training')
     group.add_argument('--num-epoch', type=int, default=60,

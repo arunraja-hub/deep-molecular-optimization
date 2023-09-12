@@ -18,7 +18,7 @@ class BaseTrainer(ABC):
     def __init__(self, opt):
 
         self.save_path = os.path.join('experiments', opt.save_directory)
-        self.summary_writer = SummaryWriter(logdir=os.path.join(self.save_path, 'tensorboard-original-source2target-with-optuna'))
+        # self.summary_writer = SummaryWriter(logdir=os.path.join(self.save_path, 'tensorboard-original-source2target-with-optuna'))
         # LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'train_model-switch-source-target.log'))
         # self.LOG = LOG
         # self.LOG.info(opt)
