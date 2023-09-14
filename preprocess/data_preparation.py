@@ -35,9 +35,14 @@ def split_data(input_transformations_path, LOG=None):
     if LOG:
         LOG.info("Read %s file" % input_transformations_path)
 
+    #smaller subset
+    _, data = train_test_split(
+        data, test_size=0.0001, random_state=SEED)
+
     train, test = train_test_split(
         data, test_size=0.1, random_state=SEED)
     train, validation = train_test_split(train, test_size=0.1, random_state=SEED)
+
     if LOG:
         LOG.info("Train, Validation, Test: %d, %d, %d" % (len(train), len(validation), len(test)))
 

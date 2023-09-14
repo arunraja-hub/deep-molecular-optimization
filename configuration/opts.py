@@ -9,7 +9,7 @@ def train_opts(parser):
     group = parser.add_argument_group('Training_options')
     group.add_argument('--batch-size', type=int, default=32,
                        help='Batch size for training')
-    group.add_argument('--num-epoch', type=int, default=60,
+    group.add_argument('--num-epoch', type=int, default=10,
                        help='Number of training steps')
     group.add_argument('--starting-epoch', type=int, default=1,
                        help="Training from given starting epoch")

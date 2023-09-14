@@ -34,10 +34,10 @@ class TransformerTrainer(BaseTrainer):
     def __init__(self, opt):
         super().__init__(opt)
 
-    def get_model(self, opt, vocab, device, trial):
+    def get_model(self, opt, vocab, device):
         vocab_size = len(vocab.tokens())
 
-        LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'tensorboard-original-source2target-with-optuna.log'))
+        LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'tensorboard-original-source2target.log'))
         self.LOG = LOG
 
         # opt.N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
@@ -48,7 +48,7 @@ class TransformerTrainer(BaseTrainer):
 
         if opt.starting_epoch == 1:
             # define model
-            self.LOG.info("Optuna current params:{}".format(trial.params))
+            # self.LOG.info("Optuna current params:{}".format(trial.params))
             model = EncoderDecoder.make_model(vocab_size, vocab_size, N=opt.N,
                                           d_model=opt.d_model, d_ff=opt.d_ff, h=opt.H, dropout=opt.dropout)
         else:
@@ -66,8 +66,8 @@ class TransformerTrainer(BaseTrainer):
         return model
 
     def _initialize_optimizer(self, model, opt):
-        optim = moptim(model.module.src_embed[0].d_model, opt.factor, opt.warmup_steps,
-                       torch.optim.Adam(model.module.parameters(), lr=0, betas=(opt.adam_beta1, opt.adam_beta2),
+        optim = moptim(model.src_embed[0].d_model, opt.factor, opt.warmup_steps,
+                       torch.optim.Adam(model.parameters(), lr=0, betas=(opt.adam_beta1, opt.adam_beta2),
                                         eps=opt.adam_eps))
         return optim
 
@@ -197,7 +197,7 @@ class TransformerTrainer(BaseTrainer):
 
         torch.save(save_dict, file_name)
 
-    def train(self, opt, trial):
+    def train(self, opt):
         # Load vocabulary
         with open(os.path.join(opt.data_path, 'vocab.pkl'), "rb") as input_file:
             vocab = pkl.load(input_file)
@@ -209,7 +209,7 @@ class TransformerTrainer(BaseTrainer):
 
         device = ut.allocate_gpu()
 
-        model = self.get_model(opt, vocab, device, trial)
+        model = self.get_model(opt, vocab, device)
         optim = self.get_optimization(model, opt)
 
         pad_idx = cfgd.DATA_DEFAULT['padding_value']
@@ -224,7 +224,7 @@ class TransformerTrainer(BaseTrainer):
             loss_epoch_train = self.train_epoch(dataloader_train,
                                                        model,
                                                        SimpleLossCompute(
-                                                                 model.module.generator,
+                                                                 model.generator,
                                                                  criterion,
                                                                  optim), device)
 
@@ -237,15 +237,15 @@ class TransformerTrainer(BaseTrainer):
                 dataloader_validation,
                 model,
                 SimpleLossCompute(
-                    model.module.generator, criterion, None),
+                    model.generator, criterion, None),
                 device, vocab)
             
-            print('optuna trial.report(accuracy, step= epoch)')
-            trial.report(accuracy, step = epoch)
+            # print('optuna trial.report(accuracy, step= epoch)')
+            # trial.report(accuracy, step = epoch)
 
-            # Handle pruning based on the intermediate value.
-            if trial.should_prune():
-                raise optuna.exceptions.TrialPruned()
+            # # Handle pruning based on the intermediate value.
+            # if trial.should_prune():
+            #     raise optuna.exceptions.TrialPruned()
 
 
             self.LOG.info("Validation end")
