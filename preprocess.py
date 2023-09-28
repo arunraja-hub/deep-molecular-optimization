@@ -45,7 +45,7 @@ if __name__ == "__main__":
             intervals = property_change_encoder[property_name]
             for name in intervals:
                 property_condition.append("{}_{}".format(property_name, name))
-    LOG.info("Property condition tokens: {}".format(len(property_condition)))
+    LOG.info("Property condition tokens: {},len: {}".format(property_condition,len(property_condition)))
 
     encoded_file = pdp.save_df_property_encoded(args.input_data_path, property_change_encoder, LOG)
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     # Save vocabulary to file
     parent_path = uf.get_parent_dir(args.input_data_path)
-    output_file = os.path.join(parent_path, 'vocab_{}.pkl'.format(200723))
+    output_file = os.path.join(parent_path, 'vocab_{}.pkl'.format('ecfp'))
     with open(output_file, 'wb') as pickled_file:
         pickle.dump(vocabulary, pickled_file)
     LOG.info("Save vocabulary to file: {}".format(output_file))
