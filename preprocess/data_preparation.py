@@ -15,39 +15,28 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import DataStructs
+from e3fp.pipeline import fprints_from_smiles, fprints_from_mol
 
 
 
-# define function that transforms SMILES strings into ECFPs
-def ECFP_from_smiles(smiles,
-                     R = 2,
-                     L = 2**7,
-                     use_features = False,
-                     use_chirality = False):
-    """
-    Inputs:
-    
-    - smiles ... SMILES string of input compound
-    - R ... maximum radius of circular substructures
-    - L ... fingerprint-length
-    - use_features ... if false then use standard DAYLIGHT atom features, if true then use pharmacophoric atom features
-    - use_chirality ... if true then append tetrahedral chirality flags to atom features
-    
-    Outputs:
-    - np.array(feature_list) ... ECFP with length L and maximum radius R
-    """
-    
-    molecule = Chem.MolFromSmiles(smiles)
-    fp = AllChem.GetMorganFingerprintAsBitVect(molecule, 2, nBits=L)
-    # AllChem.GetMorganFingerprintAsBitVect(molecule,
-    #                                                                    radius = R,
-    #                                                                    nBits = L,
-    #                                                                    useFeatures = use_features,
-    #                                                                    useChirality = use_chirality)
-    feature_arr = np.zeros((0,), dtype=np.int8)
-    DataStructs.ConvertToNumpyArray(fp,feature_arr)
-    # print(smiles, '--', feature_arr)
-    return np.array(feature_arr)
+
+# define function that transforms SMILES strings into E3FPs
+def e3fp_from_smiles(smiles_string):
+
+    """Function to create E3FP from a SMILES string."""
+    # mol = Chem.MolFromSmiles(smiles_string)
+    # print(mol)
+    # # fprint_params = {'bits': 2**10, 'radius_multiplier': radius_multiplier, 'rdkit_invariants': True}
+    # fpdict = fprints_dict_from_mol(mol)
+    # print(fpdict)
+    # # return np.array(fp[5][0].to_rdkit())
+    fprint_params = {'bits': 2**7, 'rdkit_invariants': True}
+    confgen_params = {'max_energy_diff': 20, 'first': 1}
+    #look into details of conformation generation of e3fp
+
+    feature_list = fprints_from_smiles(smiles_string, "placeholder_name",  fprint_params=fprint_params,confgen_params=confgen_params, save=False)
+    # confgen_params=confgen_params
+    return np.array(feature_list[0].to_rdkit())
 
 
 def get_smiles_list(file_name):
@@ -81,11 +70,11 @@ def split_data(input_transformations_path, LOG=None):
         LOG.info("Train, Validation, Test: %d, %d, %d" % (len(train), len(validation), len(test)))
 
     parent = uf.get_parent_dir(input_transformations_path)
-    train.to_csv(os.path.join(parent, "ecfp_train.csv"), index=False)
+    train.to_csv(os.path.join(parent, "e3fp_train.csv"), index=False)
     # np.save("ecfp_train.npy", train.to_numpy())
-    validation.to_csv(os.path.join(parent, "ecfp_validation.csv"), index=False)
+    validation.to_csv(os.path.join(parent, "e3fp_validation.csv"), index=False)
     # np.save("ecfp_validation.npy", train.to_numpy())
-    test.to_csv(os.path.join(parent, "ecfp_test.csv"), index=False)
+    test.to_csv(os.path.join(parent, "e3fp_test.csv"), index=False)
     # np.save("ecfp_test.npy", train.to_numpy())
 
     return train, validation, test
@@ -93,10 +82,10 @@ def split_data(input_transformations_path, LOG=None):
 def save_df_property_encoded(file_name, property_change_encoder, LOG=None):
     data = pd.read_csv(file_name, sep=",")
 
-    #smiles to ecfp
-    print('just source smiles to ecfp')
-    LOG.info('smiles to ecfp')
-    data['Source_Mol'] = data['Source_Mol'].map(ECFP_from_smiles)
+    #smiles to e3fp
+    print('just source smiles to e3fp')
+    LOG.info('smiles to e3fp')
+    data['Source_Mol'] = data['Source_Mol'].map(e3fp_from_smiles)
     # data['Target_Mol'] = data['Target_Mol'].map(ECFP_from_smiles)
 
 

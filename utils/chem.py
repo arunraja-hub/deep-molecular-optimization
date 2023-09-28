@@ -36,9 +36,9 @@ def tanimoto_similarity(smi1, smi2):
     # if smi2 and type(smi2)==str and len(smi2)>0:
     fp2 = to_fp_ECFP(smi2)
     if fp1 is not None and fp2 is not None:
-        return DataStructs.TanimotoSimilarity(fp1, fp2)
+        return DataStructs.TanimotoSimilarity(fp1, fp2), 1
     else:
-        return 0
+        return 0, 0
 
 def is_valid(smi):
     return 1 if to_mol(smi) else 0

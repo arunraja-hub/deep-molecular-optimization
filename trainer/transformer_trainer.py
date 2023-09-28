@@ -38,7 +38,7 @@ class TransformerTrainer(BaseTrainer):
     def get_model(self, opt, vocab, device):
         vocab_size = len(vocab.tokens())
 
-        LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'ecfp_source2target.log'))
+        LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'e3fp.log'))
         self.LOG = LOG
 
         # opt.N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
@@ -126,6 +126,7 @@ class TransformerTrainer(BaseTrainer):
         total_loss = 0
 
         n_correct = 0
+        n_valid = 0
         sum_tan_sim = 0
         total_n_trg = 0
         total_tokens = 0
@@ -168,7 +169,13 @@ class TransformerTrainer(BaseTrainer):
                     #compute tanimoto
                     target = tokenizer.untokenize(vocab.decode(target.cpu().numpy()))
                     seq = tokenizer.untokenize(vocab.decode(seq.cpu().numpy()))
-                    sum_tan_sim += uc.tanimoto_similarity(seq, target)
+                    _tan_sim, isvalid = uc.tanimoto_similarity(seq, target)
+                    sum_tan_sim += _tan_sim
+                    n_valid += isvalid
+                    if n_valid == 5:
+                        print('target', target)
+                        print('seq',seq)
+
                     # breakpoint()
                     if seq == target:
                         n_correct += 1
@@ -180,7 +187,7 @@ class TransformerTrainer(BaseTrainer):
 
         # Accuracy
         accuracy = n_correct*1.0 / total_n_trg
-        avg_tan_sim = sum_tan_sim*1.0 / total_n_trg
+        avg_tan_sim = sum_tan_sim*1.0 / n_valid
         # avg_tan_sim = 'None'
         loss_epoch = total_loss / total_tokens
         return loss_epoch, accuracy, avg_tan_sim
@@ -212,13 +219,13 @@ class TransformerTrainer(BaseTrainer):
 
     def train(self, opt):
         # Load vocabulary
-        with open(os.path.join(opt.data_path, 'vocab_ecfp.pkl'), "rb") as input_file:
+        with open(os.path.join(opt.data_path, 'vocab_e3fp.pkl'), "rb") as input_file:
             vocab = pkl.load(input_file)
         vocab_size = len(vocab.tokens())
 
         # Data loader
-        dataloader_train = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'ecfp_train')
-        dataloader_validation = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'ecfp_validation')
+        dataloader_train = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'e3fp_train')
+        dataloader_validation = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'e3fp_validation')
 
         device = ut.allocate_gpu()
 

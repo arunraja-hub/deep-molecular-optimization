@@ -35,4 +35,4 @@ done
 # pip install numpy
 echo $CONDA_DEFAULT_ENV
 echo "training"
-python train.py --data-path data/chembl_02 --batch-size 1024 --save-directory ecfp_source2target --model-choice transformer --num-epoch 100 transformer 
+python train.py --data-path data/chembl_02 --batch-size 1024 --save-directory e3fp --model-choice transformer --num-epoch 100 transformer 
