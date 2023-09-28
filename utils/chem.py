@@ -30,16 +30,15 @@ def tanimoto_similarity_pool(args):
     return tanimoto_similarity(*args)
 
 def tanimoto_similarity(smi1, smi2):
-    fp1, fp2 = None, None
-    if smi1 and type(smi1)==str and len(smi1)>0:
-        fp1 = to_fp_ECFP(smi1)
-    if smi2 and type(smi2)==str and len(smi2)>0:
-        fp2 = to_fp_ECFP(smi2)
-
+    # fp1, fp2 = None, None
+    # if smi1 and type(smi1)==str and len(smi1)>0:
+    fp1 = to_fp_ECFP(smi1)
+    # if smi2 and type(smi2)==str and len(smi2)>0:
+    fp2 = to_fp_ECFP(smi2)
     if fp1 is not None and fp2 is not None:
         return DataStructs.TanimotoSimilarity(fp1, fp2)
     else:
-        return None
+        return 0
 
 def is_valid(smi):
     return 1 if to_mol(smi) else 0

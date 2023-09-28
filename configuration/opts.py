@@ -7,7 +7,7 @@ def train_opts(parser):
     parser.add_argument('--model-choice', required=True, help="transformer or seq2seq")
     # Common training options
     group = parser.add_argument_group('Training_options')
-    group.add_argument('--batch-size', type=int, default=32,
+    group.add_argument('--batch-size', type=int, default=512,
                        help='Batch size for training')
     group.add_argument('--num-epoch', type=int, default=60,
                        help='Number of training steps')

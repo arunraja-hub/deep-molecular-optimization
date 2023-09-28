@@ -55,10 +55,14 @@ class Vocabulary:
         ohe_vect = np.zeros(len(tokens), dtype=np.float32)
         for i, token in enumerate(tokens):
             ohe_vect[i] = self._tokens[token]
+        # print(ohe_vect+2)
+        # print(self._tokens)
         return ohe_vect
 
     def decode(self, ohe_vect):
         """Decodes a one-hot encoded vector matrix to a list of tokens."""
+        ohe_vect = ohe_vect 
+        # - 2
         tokens = []
         for ohv in ohe_vect:
             tokens.append(self[ohv])
@@ -120,6 +124,25 @@ class SMILESTokenizer:
         return smi
 
 
+# def create_vocabulary(property_condition=None):
+#     """Creates a vocabulary for the SMILES syntax."""
+#     # tokens = set()
+#     # for smi in smiles_list:
+#     #     tokens.update(tokenizer.tokenize(smi, with_begin_and_end=False))
+
+#     vocabulary = Vocabulary()
+#     # vocabulary.update(["*", "^", "$"] + sorted(tokens))  # pad=0, start=1, end=2
+#     if property_condition is not None:
+#         vocabulary.update(property_condition)
+#     vocabulary.update(["66"])
+#     vocabulary.update(["67"])
+#     # # for random smiles
+#     # if "8" not in vocabulary.tokens():
+#     #     vocabulary.update(["8"])
+
+#     return vocabulary
+
+
 def create_vocabulary(smiles_list, tokenizer, property_condition=None):
     """Creates a vocabulary for the SMILES syntax."""
     tokens = set()
@@ -130,8 +153,11 @@ def create_vocabulary(smiles_list, tokenizer, property_condition=None):
     vocabulary.update(["*", "^", "$"] + sorted(tokens))  # pad=0, start=1, end=2
     if property_condition is not None:
         vocabulary.update(property_condition)
+    vocabulary.update(["66"])
+    vocabulary.update(["67"])
+    
     # for random smiles
     if "8" not in vocabulary.tokens():
         vocabulary.update(["8"])
-
+    # breakpoint()
     return vocabulary

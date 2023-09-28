@@ -47,7 +47,8 @@ class GenerateRunner():
         """
 
         # Load test file
-        data = pd.read_csv(os.path.join(opt.data_path, test_file + '.csv'), sep=",")
+        # data = pd.read_csv(os.path.join(opt.data_path, test_file + '.csv'), sep=",")
+        data = np.load(os.path.join(opt.data_path, test_file + '.npy'))
         dataset = md.Dataset(data=data, vocabulary=vocab, tokenizer=self.tokenizer, prediction_mode=True) #prediction_mode=True because only the source moleculaes have to be tokenised
         dataloader = torch.utils.data.DataLoader(dataset, opt.batch_size,
                                                  shuffle=False, collate_fn=md.Dataset.collate_fn)

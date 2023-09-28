@@ -13,6 +13,7 @@ torch.cuda.empty_cache()
 import configuration.config_default as cfgd
 import utils.log as ul
 import utils.file as uf
+import utils.chem as uc
 import utils.torch_util as ut
 import preprocess.vocabulary as mv
 from models.transformer.encode_decode.model import EncoderDecoder
@@ -37,7 +38,7 @@ class TransformerTrainer(BaseTrainer):
     def get_model(self, opt, vocab, device):
         vocab_size = len(vocab.tokens())
 
-        LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'tensorboard-original-source2target-with-optuna.log'))
+        LOG = ul.get_logger(name="train_model", log_path=os.path.join(self.save_path, 'ecfp_source2target.log'))
         self.LOG = LOG
 
         # opt.N = trial.suggest_categorical ("N", [2 * i for i in range(1,6)])
@@ -97,6 +98,7 @@ class TransformerTrainer(BaseTrainer):
         total_tokens = 0
         for i, batch in enumerate(ul.progress_bar(dataloader, total=len(dataloader))):
             src, source_length, trg, src_mask, trg_mask, _, _ = batch
+            # breakpoint()
 
             trg_y = trg[:, 1:].to(device)  # skip start token
 
@@ -124,6 +126,7 @@ class TransformerTrainer(BaseTrainer):
         total_loss = 0
 
         n_correct = 0
+        sum_tan_sim = 0
         total_n_trg = 0
         total_tokens = 0
 
@@ -131,6 +134,7 @@ class TransformerTrainer(BaseTrainer):
         for i, batch in enumerate(ul.progress_bar(dataloader, total=len(dataloader))):
 
             src, source_length, trg, src_mask, trg_mask, _, _ = batch
+            # breakpoint()
 
             trg_y = trg[:, 1:].to(device)  # skip start token
 
@@ -151,14 +155,21 @@ class TransformerTrainer(BaseTrainer):
                 total_tokens += ntokens
                 # Decode
                 max_length_target = cfgd.DATA_DEFAULT['max_sequence_length']
+                # trg.shape[1]
+                # cfgd.DATA_DEFAULT['max_sequence_length']
                 smiles = decode(model, src, src_mask, max_length_target, type='greedy')
+
+                
 
                 # Compute accuracy
                 for j in range(trg.size()[0]):
                     seq = smiles[j, :]
                     target = trg[j]
+                    #compute tanimoto
                     target = tokenizer.untokenize(vocab.decode(target.cpu().numpy()))
                     seq = tokenizer.untokenize(vocab.decode(seq.cpu().numpy()))
+                    sum_tan_sim += uc.tanimoto_similarity(seq, target)
+                    # breakpoint()
                     if seq == target:
                         n_correct += 1
 
@@ -169,8 +180,10 @@ class TransformerTrainer(BaseTrainer):
 
         # Accuracy
         accuracy = n_correct*1.0 / total_n_trg
+        avg_tan_sim = sum_tan_sim*1.0 / total_n_trg
+        # avg_tan_sim = 'None'
         loss_epoch = total_loss / total_tokens
-        return loss_epoch, accuracy
+        return loss_epoch, accuracy, avg_tan_sim
 
     def _get_model_parameters(self, vocab_size, opt):
         return {
@@ -199,13 +212,13 @@ class TransformerTrainer(BaseTrainer):
 
     def train(self, opt):
         # Load vocabulary
-        with open(os.path.join(opt.data_path, 'vocab.pkl'), "rb") as input_file:
+        with open(os.path.join(opt.data_path, 'vocab_ecfp.pkl'), "rb") as input_file:
             vocab = pkl.load(input_file)
         vocab_size = len(vocab.tokens())
 
         # Data loader
-        dataloader_train = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'train')
-        dataloader_validation = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'validation')
+        dataloader_train = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'ecfp_train')
+        dataloader_validation = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'ecfp_validation')
 
         device = ut.allocate_gpu()
 
@@ -233,7 +246,7 @@ class TransformerTrainer(BaseTrainer):
 
             self.LOG.info("Validation start")
             model.eval()
-            loss_epoch_validation, accuracy = self.validation_stat(
+            loss_epoch_validation, accuracy, avg_tan_sim = self.validation_stat(
                 dataloader_validation,
                 model,
                 SimpleLossCompute(
@@ -251,8 +264,8 @@ class TransformerTrainer(BaseTrainer):
             self.LOG.info("Validation end")
 
             self.LOG.info(
-                "Train loss, Validation loss, accuracy: {}, {}, {}".format(loss_epoch_train, loss_epoch_validation,
-                                                                           accuracy))
+                "Train loss, Validation loss, accuracy, avg_tan_sim: {}, {}, {}, {}".format(loss_epoch_train, loss_epoch_validation,
+                                                                           accuracy, avg_tan_sim))
 
             self.to_tensorboard(loss_epoch_train, loss_epoch_validation, accuracy, epoch)
 

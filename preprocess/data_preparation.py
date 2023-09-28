@@ -10,6 +10,45 @@ import preprocess.property_change_encoder as pce
 SEED = 42
 SPLIT_RATIO = 0.8
 
+# import packages
+import numpy as np
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from rdkit.Chem import DataStructs
+
+
+
+# define function that transforms SMILES strings into ECFPs
+def ECFP_from_smiles(smiles,
+                     R = 2,
+                     L = 2**7,
+                     use_features = False,
+                     use_chirality = False):
+    """
+    Inputs:
+    
+    - smiles ... SMILES string of input compound
+    - R ... maximum radius of circular substructures
+    - L ... fingerprint-length
+    - use_features ... if false then use standard DAYLIGHT atom features, if true then use pharmacophoric atom features
+    - use_chirality ... if true then append tetrahedral chirality flags to atom features
+    
+    Outputs:
+    - np.array(feature_list) ... ECFP with length L and maximum radius R
+    """
+    
+    molecule = Chem.MolFromSmiles(smiles)
+    fp = AllChem.GetMorganFingerprintAsBitVect(molecule, 2, nBits=L)
+    # AllChem.GetMorganFingerprintAsBitVect(molecule,
+    #                                                                    radius = R,
+    #                                                                    nBits = L,
+    #                                                                    useFeatures = use_features,
+    #                                                                    useChirality = use_chirality)
+    feature_arr = np.zeros((0,), dtype=np.int8)
+    DataStructs.ConvertToNumpyArray(fp,feature_arr)
+    # print(smiles, '--', feature_arr)
+    return np.array(feature_arr)
+
 
 def get_smiles_list(file_name):
     """
@@ -42,14 +81,25 @@ def split_data(input_transformations_path, LOG=None):
         LOG.info("Train, Validation, Test: %d, %d, %d" % (len(train), len(validation), len(test)))
 
     parent = uf.get_parent_dir(input_transformations_path)
-    train.to_csv(os.path.join(parent, "train.csv"), index=False)
-    validation.to_csv(os.path.join(parent, "validation.csv"), index=False)
-    test.to_csv(os.path.join(parent, "test.csv"), index=False)
+    train.to_csv(os.path.join(parent, "ecfp_train.csv"), index=False)
+    # np.save("ecfp_train.npy", train.to_numpy())
+    validation.to_csv(os.path.join(parent, "ecfp_validation.csv"), index=False)
+    # np.save("ecfp_validation.npy", train.to_numpy())
+    test.to_csv(os.path.join(parent, "ecfp_test.csv"), index=False)
+    # np.save("ecfp_test.npy", train.to_numpy())
 
     return train, validation, test
 
 def save_df_property_encoded(file_name, property_change_encoder, LOG=None):
     data = pd.read_csv(file_name, sep=",")
+
+    #smiles to ecfp
+    print('just source smiles to ecfp')
+    LOG.info('smiles to ecfp')
+    data['Source_Mol'] = data['Source_Mol'].map(ECFP_from_smiles)
+    # data['Target_Mol'] = data['Target_Mol'].map(ECFP_from_smiles)
+
+
     for property_name in cfgd.PROPERTIES:
         if property_name == 'LogD':
             encoder, start_map_interval = property_change_encoder[property_name]

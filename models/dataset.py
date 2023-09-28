@@ -18,9 +18,12 @@ from molfeat.trans.pretrained import GraphormerTransformer
 
 
 import numpy as np
+import ast
+
 
 import os
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
+
 
 class Dataset(tud.Dataset):
     """Custom PyTorch Dataset that takes a file containing
@@ -53,7 +56,13 @@ class Dataset(tud.Dataset):
         row = self._data.iloc[i]
 
         # tokenize and encode source smiles
-        source_smi = row['Source_Mol']
+        # breakpoint()
+        source_ecfp = np.array(ast.literal_eval(row['Source_Mol'].replace('\n', '').replace(' ',',')))
+        source_ecfp[source_ecfp == 0] = 66
+        source_ecfp[source_ecfp == 1] = 67
+        
+        # row['Source_Mol']
+        # source_ecfp = np.array(list(map(int,list(source_ecfp)[1:-1])))
         source_tokens = []
 
         for property_name in cfgd.PROPERTIES:
@@ -63,18 +72,20 @@ class Dataset(tud.Dataset):
                 change = row['Delta_{}'.format(property_name)]
                 source_tokens.append(f"{property_name}_{change}")
 
-        transformer = GraphormerTransformer(kind='pcqm4mv2_graphormer_base', dtype=float)
-
-
-        source_tokens.extend(transformer(source_smi))
-        source_encoded = np.concatenate((self._vocabulary.encode(source_tokens[:3]), np.squeeze(transformer(source_smi).T)))
-        # self._vocabulary.encode(source_tokens)
-
+        source_encoded = self._vocabulary.encode(np.hstack([source_tokens,source_ecfp]))
+        # source_encoded = np.hstack([source_tokens,source_ecfp])
+        
         # tokenize and encode target smiles if it is for training instead of evaluation
         if not self._prediction_mode:
             target_smi = row['Target_Mol']
             target_tokens = self._tokenizer.tokenize(target_smi)
             target_encoded = self._vocabulary.encode(target_tokens)
+            # target_ecfp = np.array(ast.literal_eval(row['Target_Mol'].replace('\n', '').replace(' ',',')))
+            # target_ecfp[target_ecfp == 0] = 66
+            # target_ecfp[target_ecfp == 1] = 67
+            # # target_tokens = self._tokenizer.tokenize(target_smi)
+            # target_encoded = target_ecfp
+            # # self._vocabulary.encode(target_ecfp)
 
             return torch.tensor(source_encoded, dtype=torch.long), torch.tensor(
                 target_encoded, dtype=torch.long), row
