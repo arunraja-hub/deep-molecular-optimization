@@ -27,8 +27,8 @@ for dir in */; do
 done
 #python -m venv gin7
 #source gin7/bin/activate
-# module load Anaconda3/2022.10
-# conda activate /data/stat-cadd/shil5919/molfeat
+module load Anaconda3/2022.10
+conda activate /data/stat-cadd/shil5919/molfeat
 # pip3 install torch torchvision torchaudio
 # pip install molfeat[graphormer]
 # pip install molfeat[transformer]

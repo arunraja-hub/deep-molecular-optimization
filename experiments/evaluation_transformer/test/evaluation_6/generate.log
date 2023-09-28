@@ -1,2 +1,0 @@
-14:55:54: generate.__init__ +31: INFO     Namespace(batch_size=128, data_path='data/chembl_02', decode_type='multinomial', epoch=6, model_choice='transformer', model_path='experiments/train_transformer/checkpoint', num_samples=10, save_directory='evaluation_transformer', test_file_name='test')
-14:55:54: generate.__init__ +32: INFO     Save directory: experiments/evaluation_transformer/test/evaluation_6

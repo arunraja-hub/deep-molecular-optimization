@@ -121,11 +121,13 @@ class TransformerTrainer(BaseTrainer):
 
         return loss_epoch
 
+    
     def validation_stat(self, dataloader, model, loss_compute, device, vocab):
         pad = cfgd.DATA_DEFAULT['padding_value']
         total_loss = 0
 
         n_correct = 0
+        n_valid = 0
         sum_tan_sim = 0
         total_n_trg = 0
         total_tokens = 0
@@ -168,7 +170,13 @@ class TransformerTrainer(BaseTrainer):
                     #compute tanimoto
                     target = tokenizer.untokenize(vocab.decode(target.cpu().numpy()))
                     seq = tokenizer.untokenize(vocab.decode(seq.cpu().numpy()))
-                    sum_tan_sim += uc.tanimoto_similarity(seq, target)
+                    _tan_sim, isvalid = uc.tanimoto_similarity(seq, target)
+                    sum_tan_sim += _tan_sim
+                    n_valid += isvalid
+                    if n_valid == 5:
+                        print('target', target)
+                        print('seq',seq)
+
                     # breakpoint()
                     if seq == target:
                         n_correct += 1
@@ -180,7 +188,7 @@ class TransformerTrainer(BaseTrainer):
 
         # Accuracy
         accuracy = n_correct*1.0 / total_n_trg
-        avg_tan_sim = sum_tan_sim*1.0 / total_n_trg
+        avg_tan_sim = sum_tan_sim*1.0 / n_valid
         # avg_tan_sim = 'None'
         loss_epoch = total_loss / total_tokens
         return loss_epoch, accuracy, avg_tan_sim
