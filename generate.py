@@ -14,7 +14,7 @@ import configuration.config_default as cfgd
 import models.dataset as md
 import preprocess.vocabulary as mv
 import configuration.opts as opts
-from models.transformer.module.decode import decode
+from models.transformer.module.decode import *
 from models.transformer.encode_decode.model import EncoderDecoder
 from models.seq2seq.model import Model
 
@@ -32,7 +32,7 @@ class GenerateRunner():
         LOG.info("Save directory: {}".format(self.save_path))
 
         # Load vocabulary
-        with open(os.path.join(opt.data_path, 'vocab.pkl'), "rb") as input_file:
+        with open(os.path.join(opt.data_path, 'vocab_ecfp.pkl'), "rb") as input_file:
             vocab = pkl.load(input_file)
         self.vocab = vocab
         self.tokenizer = mv.SMILESTokenizer()
@@ -47,8 +47,8 @@ class GenerateRunner():
         """
 
         # Load test file
-        # data = pd.read_csv(os.path.join(opt.data_path, test_file + '.csv'), sep=",")
-        data = np.load(os.path.join(opt.data_path, test_file + '.npy'))
+        data = pd.read_csv(os.path.join(opt.data_path, test_file + '.csv'), sep=",")
+        # data = np.load(os.path.join(opt.data_path, test_file + '.npy'))
         dataset = md.Dataset(data=data, vocabulary=vocab, tokenizer=self.tokenizer, prediction_mode=True) #prediction_mode=True because only the source moleculaes have to be tokenised
         dataloader = torch.utils.data.DataLoader(dataset, opt.batch_size,
                                                  shuffle=False, collate_fn=md.Dataset.collate_fn)
@@ -59,8 +59,13 @@ class GenerateRunner():
         # set device
         device = ut.allocate_gpu()
 
+        with open(os.path.join(opt.data_path, 'vocab_ecfp.pkl'), "rb") as input_file:
+            vocab_ecfp = pkl.load(input_file)
         # Data loader
-        dataloader_test = self.initialize_dataloader(opt, self.vocab, opt.test_file_name)
+        # dataloader_train = self.initialize_dataloader(opt.data_path, opt.batch_size, vocab, 'ecfp_train')
+
+        # Data loader
+        dataloader_test = self.initialize_dataloader(opt, vocab = vocab_ecfp, test_file = 'ecfp_test')
 
         # Load model
         file_name = os.path.join(opt.model_path, f'model_{opt.epoch}.pt')
@@ -148,7 +153,7 @@ class GenerateRunner():
 
                 # sample molecule
                 if model_choice == 'transformer':
-                    sequences = decode(model, src_current, mask_current, max_len, decode_type)
+                    sequences = decode_test(model, src_current, mask_current, max_len, decode_type)
                     padding = (0, max_len-sequences.shape[1],
                                0, 0)
                     sequences = torch.nn.functional.pad(sequences, padding)

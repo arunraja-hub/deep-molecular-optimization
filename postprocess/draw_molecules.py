@@ -377,7 +377,8 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
 
         # find maximum common structure
         mols = [Chem.MolFromSmiles(row["Source_Mol"]), Chem.MolFromSmiles(str(row["Target_Mol"]))]
-        if mols[1]:
+        if mols[0] is not None and mols[1] is not None:
+            breakpoint()
             res = rdFMCS.FindMCS(mols)
             patt = Chem.MolFromSmarts(res.smartsString)
             for mol in mols:
@@ -388,47 +389,49 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
             matches_list.extend([(), ()])
 
         for j in range(1, NUM_SAMPLES + 1):
-            if row["Predicted_smi_" + str(j)] == 0:
-                generated_mols.append("NOSMILE")
-            else:
-                not_satisfy = 1-row['Predict_eval_{}_{}_{}'.format(j, 'LogD', cfgd.PROPERTY_ERROR['LogD'])]
+            # breakpoint()
+            # if row["Predicted_smi_" + str(j)] == 0:
+            #     generated_mols.append("NOSMILE")
+            # else:
+            #     not_satisfy = 1-row['Predict_eval_{}_{}_{}'.format(j, 'LogD', cfgd.PROPERTY_ERROR['LogD'])]
 
-                save_info = (not_satisfy, row['num_correct_allprop_sumoversample_allerror'])
+            #     save_info = (not_satisfy, row['num_correct_allprop_sumoversample_allerror'])
 
-                solubility_bool = row['Predict_eval_{}_{}_{}'.format(j, 'Solubility', cfgd.PROPERTY_ERROR['Solubility'])]
-                clint_bool = row['Predict_eval_{}_{}_{}'.format(j, 'Clint', cfgd.PROPERTY_ERROR['Clint'])]
+            #     solubility_bool = row['Predict_eval_{}_{}_{}'.format(j, 'Solubility', cfgd.PROPERTY_ERROR['Solubility'])]
+            #     clint_bool = row['Predict_eval_{}_{}_{}'.format(j, 'Clint', cfgd.PROPERTY_ERROR['Clint'])]
 
-                if solubility_bool and clint_bool:
-                    option = 0
-                    green_boxes[i] = green_boxes[i] + 1
+            #     if solubility_bool and clint_bool:
+            #         option = 0
+            #         green_boxes[i] = green_boxes[i] + 1
 
-                elif solubility_bool and not clint_bool:
-                    option = 1
-                    red_boxes[i, 0] = red_boxes[i, 0] + 1
+            #     elif solubility_bool and not clint_bool:
+            #         option = 1
+            #         red_boxes[i, 0] = red_boxes[i, 0] + 1
 
-                elif not solubility_bool and clint_bool:
-                    option = 2
-                    red_boxes[i, 1] = red_boxes[i, 1] + 1
-                else:
-                    option = 3
-                    red_boxes[i, 2] = red_boxes[i, 2] + 1
+            #     elif not solubility_bool and clint_bool:
+            #         option = 2
+            #         red_boxes[i, 1] = red_boxes[i, 1] + 1
+            #     else:
+            #         option = 3
+            #         red_boxes[i, 2] = red_boxes[i, 2] + 1
 
-                # find maximum common structure
-                mols = [Chem.MolFromSmiles(row["Source_Mol"])]
-                mol_gen = Chem.MolFromSmiles(str(row["Predicted_smi_" + str(j)]))
-                if mol_gen:
-                    mols.append(mol_gen)
-                    res = rdFMCS.FindMCS(mols)
-                    patt = Chem.MolFromSmarts(res.smartsString)
-                    sub = mols[1].GetSubstructMatches(patt)
+            # find maximum common structure
+            mols = [Chem.MolFromSmiles(row["Source_Mol"])]
+            mol_gen = Chem.MolFromSmiles(str(row["Predicted_smi_" + str(j)]))
+            if mol_gen is not None:
+                mols.append(mol_gen)
+                breakpoint()
+                res = rdFMCS.FindMCS([m for m in mols if m is not None])
+                patt = Chem.MolFromSmarts(res.smartsString)
+                sub = mols[1].GetSubstructMatches(patt)
 
-                    if len(sub) > 0:
-                        matches = sub[0]
-                        matches = tuple(tuple(set(range(len(mols[1].GetAtoms()))) - set(matches)))
-                    else:
-                        matches = ()
+                if len(sub) > 0:
+                    matches = sub[0]
+                    matches = tuple(tuple(set(range(len(mols[1].GetAtoms()))) - set(matches)))
                 else:
                     matches = ()
+            else:
+                matches = ()
             smiles_status = (str(row["Predicted_smi_" + str(j)]), save_info, option, j, matches)
             generated_mols.append(smiles_status)
 

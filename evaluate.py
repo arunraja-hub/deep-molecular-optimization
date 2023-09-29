@@ -15,6 +15,8 @@ import utils.file as uf
 import utils.plot as up
 import configuration.opts as opts
 from postprocess import draw_molecules
+from itertools import starmap
+
 
 NUM_WORKERS = 16
 
@@ -54,10 +56,10 @@ class EvaluationRunner:
         out_file = self.data_path.split(".csv")[0] + "_statistics.csv"
         self.data.to_csv(out_file, index=False)
 
-        # Draw molecules
-        LOG.info("Drawing molecules")
-        image = draw_molecules.get_plot_sample(self.data, nr_of_source_mol=50, range_evaluation=self.range_evaluation)
-        image.save(os.path.join(self.output_path, 'draw_molecules.png'), format='png')
+        # # Draw molecules
+        # LOG.info("Drawing molecules")
+        # image = draw_molecules.get_plot_sample(self.data, nr_of_source_mol=50, range_evaluation=self.range_evaluation)
+        # image.save(os.path.join(self.output_path, 'draw_molecules.png'), format='png')
 
     def property_stat(self):
         LOG.info("-----------------Looking at properties separately---------------------------")
@@ -154,14 +156,15 @@ class EvaluationRunner:
 
     def compute_similarity(self):
         LOG.info('Computing Tanimoto similarity')
-        source_smiles_list = self.data['Source_Mol'].tolist()
+        #was Source_Mol
+        source_smiles_list = self.data['Target_Mol'].tolist()
         similarities = []
         for i in range(self.num_samples):
             pred_smi_list = self.data['Predicted_smi_{}'.format(i + 1)].tolist()
-            zipped = list(zip(source_smiles_list, pred_smi_list))
+            zipped = zip(source_smiles_list, pred_smi_list)
             with Pool(NUM_WORKERS) as p:
                 results = p.map(uc.tanimoto_similarity_pool, zipped)
-            similarities.extend(results)
+            similarities.append(results)
         results_not_none = [s for s in similarities if s]
         up.hist_box_list(results_not_none, name="similarity",
                     path=self.output_path, title="Similarity")

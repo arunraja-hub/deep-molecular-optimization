@@ -69,5 +69,16 @@ class EncoderDecoder(nn.Module):
         model = EncoderDecoder.make_model(vocab_size, vocab_size, para_dict['N'],
                                   para_dict['d_model'], para_dict['d_ff'],
                                   para_dict['H'], para_dict['dropout'])
-        model.load_state_dict(checkpoint['model_state_dict'])
+        checkpoint_without_module = checkpoint['model_state_dict'].copy()
+
+        keys_with_module = list(checkpoint_without_module.keys())
+        for k in keys_with_module:
+            checkpoint_without_module[k.removeprefix('module.')] = checkpoint_without_module[k]
+            del checkpoint_without_module[k]
+
+        model.load_state_dict(checkpoint_without_module)
+        # if torch.cuda.device_count() > 1:
+        #     print("Let's use", torch.cuda.device_count(), "GPUs!")
+        #     # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
+        #     model = nn.DataParallel(model)
         return model

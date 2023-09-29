@@ -30,6 +30,7 @@ done
 source activate molopt
 echo $CONDA_DEFAULT_ENV
 echo "evaluating"
-python evaluate.py --data-path experiments/evaluation_transformer/test/evaluation_30/generated_molecules_epoch30.csv
+python evaluate.py --data-path  experiments/evaluation_transformer/test/evaluation_100/generated_molecules_epoch100.csv
+# experiments/evaluation_transformer/test/evaluation_30/generated_molecules_epoch30.csv
 python evaluate.py --data-path experiments/evaluation_transformer/test_not_in_train/evaluation_30/generated_molecules_epoch30.csv
 python evaluate.py --data-path experiments/evaluation_transformer/test_unseen_L-1_S01_C10_range/evaluation_30/generated_molecules_epoch30.csv --range-evaluation lower
