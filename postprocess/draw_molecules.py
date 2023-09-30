@@ -4,7 +4,7 @@ from PIL import ImageDraw
 from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import rdFMCS
-
+import pandas as pd
 import configuration.config_default as cfgd
 
 SEED = 0
@@ -24,14 +24,16 @@ def get_plot_sample(df_predictions, nr_of_source_mol=50, range_evaluation=""):
 
     # Get legends
     legends = _get_legends(df_predictions, molecules, all_tuples_mol, sampled_index, range_evaluation)
+    # breakpoint()
 
     img = Draw.MolsToGridImage(
         molecules,
         molsPerRow=MOLS_PER_ROW,
         subImgSize=(IMG_SIZE, IMG_SIZE),
-        legends=legends,
         highlightAtomLists=matches_list
     )
+            # legends=legends,
+
 
     # Add boxes and additional text
     for i in range(nr_of_source_mol):
@@ -56,7 +58,7 @@ def get_plot_sample(df_predictions, nr_of_source_mol=50, range_evaluation=""):
             img, i, nr_boxes=int(red_boxes[i][2]), previous_index=last_index
         )
 
-        img = _add_red_LogD_boxes(img, i, all_tuples_mol)
+        # img = _add_red_LogD_boxes(img, i, all_tuples_mol)
 
     return img
 
@@ -349,12 +351,13 @@ def _get_legends(predictions, molecules, all_gen_mols, sampled_indices, range_ev
             f"[LogD: {lower_value:.2f}-{cfgd.LOD_MAX}  Sol: {row['Delta_Solubility']}  Clint: {row['Delta_Clint']}]"
         )
 
-        # Add generated molecules
-        for j in range(NUM_SAMPLES):
-            index = all_gen_mols[i][j][-2]
-            legends.append(
-                f"[LogD: {row['Predict_smi_' + str(index) + '_cLogD']:.2f}   Sol: {row['Predict_smi_' + str(index) + '_cSolubility']:.2f}  Clint: {row['Predict_smi_' + str(index) + '_cClint']:.2f}]"
-            )
+        # # Add generated molecules
+        # for j in range(NUM_SAMPLES):
+        #     index = all_gen_mols[i][j][-2]
+        #     legends.append(
+        #         f"[LogD: {row['Predict_smi_' + str(index)]:.2f}   Sol: {row['Predict_smi_' + str(index) ]:.2f}  Clint: {row['Predict_smi_' + str(index)  ]:.2f}]"
+        #         # f"[LogD: {row['Predict_smi_' + str(index) + '_cLogD']:.2f}   Sol: {row['Predict_smi_' + str(index) + '_cSolubility']:.2f}  Clint: {row['Predict_smi_' + str(index) + '_cClint']:.2f}]"
+        #     )
     return legends
 
 
@@ -367,18 +370,20 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
     all_gen_mols = []
     matches_all =[]
 
+    source_df = pd.read_csv('/data/stat-cadd/shil5919/deep-molecular-optimization/data/chembl_02/mmp_prop.csv')
     for i, sample_idx in enumerate(sampled_indices):
         row = predictions.loc[sample_idx]
+        row_source = source_df.loc[sample_idx]
 
         # Fill batch with source, target and all 10 generated molecules
-        batch = [row["Source_Mol"], row["Target_Mol"]]
+        batch = [row_source["Source_Mol"], row["Target_Mol"]]
         generated_mols = []
         matches_list = []
 
         # find maximum common structure
-        mols = [Chem.MolFromSmiles(row["Source_Mol"]), Chem.MolFromSmiles(str(row["Target_Mol"]))]
-        if mols[0] is not None and mols[1] is not None:
-            breakpoint()
+        mols = [Chem.MolFromSmiles(row_source["Source_Mol"]), Chem.MolFromSmiles(str(row["Target_Mol"]))]
+        if mols[1] is not None:
+            # breakpoint()
             res = rdFMCS.FindMCS(mols)
             patt = Chem.MolFromSmarts(res.smartsString)
             for mol in mols:
@@ -416,11 +421,10 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
             #         red_boxes[i, 2] = red_boxes[i, 2] + 1
 
             # find maximum common structure
-            mols = [Chem.MolFromSmiles(row["Source_Mol"])]
+            mols = [Chem.MolFromSmiles(row_source["Source_Mol"])]
             mol_gen = Chem.MolFromSmiles(str(row["Predicted_smi_" + str(j)]))
             if mol_gen is not None:
                 mols.append(mol_gen)
-                breakpoint()
                 res = rdFMCS.FindMCS([m for m in mols if m is not None])
                 patt = Chem.MolFromSmarts(res.smartsString)
                 sub = mols[1].GetSubstructMatches(patt)
@@ -432,11 +436,13 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
                     matches = ()
             else:
                 matches = ()
-            smiles_status = (str(row["Predicted_smi_" + str(j)]), save_info, option, j, matches)
+            # save_info, option
+            smiles_status = (str(row["Predicted_smi_" + str(j)]), j, matches)
             generated_mols.append(smiles_status)
 
+        ##NO SORTING--------------------
         # Sort molecules after option(Green first then red in consequtive order) and then after abs(delta LogD)
-        generated_mols = sorted(generated_mols, key=lambda x: (x[2], x[1][0]))
+        # generated_mols = sorted(generated_mols, key=lambda x: (x[2], x[1][0]))
 
         batch.extend([tuple[0] for tuple in generated_mols])
         all_gen_mols.append(generated_mols)

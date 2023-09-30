@@ -56,10 +56,10 @@ class EvaluationRunner:
         out_file = self.data_path.split(".csv")[0] + "_statistics.csv"
         self.data.to_csv(out_file, index=False)
 
-        # # Draw molecules
-        # LOG.info("Drawing molecules")
-        # image = draw_molecules.get_plot_sample(self.data, nr_of_source_mol=50, range_evaluation=self.range_evaluation)
-        # image.save(os.path.join(self.output_path, 'draw_molecules.png'), format='png')
+        # Draw molecules
+        LOG.info("Drawing molecules")
+        image = draw_molecules.get_plot_sample(self.data, nr_of_source_mol=50, range_evaluation=self.range_evaluation)
+        image.save(os.path.join(self.output_path, 'draw_molecules.png'), format='png')
 
     def property_stat(self):
         LOG.info("-----------------Looking at properties separately---------------------------")
