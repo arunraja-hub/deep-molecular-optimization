@@ -17,6 +17,10 @@ from rdkit.Chem import AllChem
 from rdkit.Chem import DataStructs
 from e3fp.pipeline import fprints_from_smiles, fprints_from_mol
 
+from multiprocessing import Pool
+
+
+NUM_WORKERS = 32
 
 
 
@@ -85,7 +89,8 @@ def save_df_property_encoded(file_name, property_change_encoder, LOG=None):
     #smiles to e3fp
     print('just source smiles to e3fp')
     LOG.info('smiles to e3fp')
-    data['Source_Mol'] = data['Source_Mol'].map(e3fp_from_smiles)
+    with Pool(NUM_WORKERS) as p:
+        data['Source_Mol'] = p.map(e3fp_from_smiles,data['Source_Mol'])
     # data['Target_Mol'] = data['Target_Mol'].map(ECFP_from_smiles)
 
 
