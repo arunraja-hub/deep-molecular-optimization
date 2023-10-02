@@ -164,7 +164,7 @@ class EvaluationRunner:
             zipped = zip(source_smiles_list, pred_smi_list)
             with Pool(NUM_WORKERS) as p:
                 results = p.map(uc.tanimoto_similarity_pool, zipped)
-            similarities.append(results)
+            similarities.extend(results)
         results_not_none = [s for s in similarities if s]
         up.hist_box_list(results_not_none, name="similarity",
                     path=self.output_path, title="Similarity")
