@@ -30,7 +30,6 @@ def hist(data_frame, field, name="hist", path="./", title=None):
     plt.close()
 
 def hist_box_list(data_list, name="hist_box", path="./", title=None):
-    breakpoint()
     fig, axs = plt.subplots(1,2,figsize=(10,4))
     axs[0].hist(data_list, bins=100)
     axs[0].set_title(title)
