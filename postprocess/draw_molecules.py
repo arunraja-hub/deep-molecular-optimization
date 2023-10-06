@@ -18,14 +18,18 @@ def get_plot_sample(df_predictions, nr_of_source_mol=50, range_evaluation=""):
     random.seed(SEED)
     nr_of_source_mol = min(nr_of_source_mol, len((df_predictions)))
     sampled_index = random.sample(list(range(len(df_predictions))), nr_of_source_mol)
+    # breakpoint()
     molecules, green_boxes, red_boxes, all_tuples_mol, matches_list = _create_boxes_and_molecules(
         df_predictions, sampled_index, nr_of_source_mol
     )
+    # mol_1_sim, green_boxes, red_boxes, all_tuples_mol, matches_list_ = _create_boxes_and_molecules(
+    #     df_predictions, indices, nr_of_source_mol
+    # )
 
     # Get legends
     legends = _get_legends(df_predictions, molecules, all_tuples_mol, sampled_index, range_evaluation)
     # breakpoint()
-
+    # mol_1_sim = np.take(df_predictions,indices)
     img = Draw.MolsToGridImage(
         molecules,
         molsPerRow=MOLS_PER_ROW,
@@ -33,9 +37,39 @@ def get_plot_sample(df_predictions, nr_of_source_mol=50, range_evaluation=""):
         highlightAtomLists=matches_list
     )
             # legends=legends,
+    # img_1_sim = Draw.MolsToGridImage(
+    #     mol_1_sim,
+    #     molsPerRow=MOLS_PER_ROW,
+    #     subImgSize=(IMG_SIZE, IMG_SIZE),
+    #     highlightAtomLists=matches_list_
+    # )
 
 
-    # Add boxes and additional text
+    # # Add boxes and additional text
+    # for i in range(nr_of_source_mol):
+    #     # Add text
+    #     img_1_sim = _add_property_threshold_test(img_1_sim, i, range_evaluation)
+    #     img_1_sim = _add_source_target_text(img_1_sim, i, range_evaluation, legends)
+    #     img_1_sim = _add_generated_mol_text(img_1_sim, i)
+
+    #     # Add boxes
+    #     img_1_sim = _add_box_around_coherent_mol(img_1_sim, i)
+
+    #     # Draw green boxes around molecules satisfying whole delta vector
+    #     img_1_sim, last_index = _add_green_boxes(img_1_sim, i, green_boxes[i], all_tuples_mol)
+
+    #     img_1_sim, last_index = _add_red_boxes_option_1(
+    #         img_1_sim, i, nr_boxes=int(red_boxes[i][0]), previous_index=last_index
+    #     )
+    #     img_1_sim, last_index = _add_red_boxes_option_2(
+    #         img_1_sim, i, nr_boxes=int(red_boxes[i][1]), previous_index=last_index
+    #     )
+    #     img_1_sim = _add_red_boxes_option_3(
+    #         img_1_sim, i, nr_boxes=int(red_boxes[i][2]), previous_index=last_index
+    #     )
+
+    #     # img = _add_red_LogD_boxes(img, i, all_tuples_mol)
+
     for i in range(nr_of_source_mol):
         # Add text
         img = _add_property_threshold_test(img, i, range_evaluation)
@@ -58,10 +92,9 @@ def get_plot_sample(df_predictions, nr_of_source_mol=50, range_evaluation=""):
             img, i, nr_boxes=int(red_boxes[i][2]), previous_index=last_index
         )
 
-        # img = _add_red_LogD_boxes(img, i, all_tuples_mol)
 
     return img
-
+    # , img_1_sim
 
 def _add_red_LogD_boxes(img, i, all_gen_mols):
     # Create red boxes for unsatisfied logD
@@ -373,15 +406,18 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
     source_df = pd.read_csv('/data/stat-cadd/shil5919/deep-molecular-optimization/data/chembl_02/mmp_prop.csv')
     for i, sample_idx in enumerate(sampled_indices):
         row = predictions.loc[sample_idx]
-        row_source = source_df.loc[sample_idx]
+        
+        row_source = source_df.loc[source_df["Source_Mol_ID"]==row["Source_Mol_ID"]]
+        
+        source_mol = row_source["Source_Mol"].tolist()[0]
 
         # Fill batch with source, target and all 10 generated molecules
-        batch = [row_source["Source_Mol"], row["Target_Mol"]]
+        batch = [source_mol, row["Target_Mol"]]
         generated_mols = []
         matches_list = []
 
         # find maximum common structure
-        mols = [Chem.MolFromSmiles(row_source["Source_Mol"]), Chem.MolFromSmiles(str(row["Target_Mol"]))]
+        mols = [Chem.MolFromSmiles(source_mol), Chem.MolFromSmiles(str(row["Target_Mol"]))]
         if mols[1] is not None:
             # breakpoint()
             res = rdFMCS.FindMCS(mols)
@@ -421,7 +457,7 @@ def _create_boxes_and_molecules(predictions, sampled_indices, nr_of_source_mol):
             #         red_boxes[i, 2] = red_boxes[i, 2] + 1
 
             # find maximum common structure
-            mols = [Chem.MolFromSmiles(row_source["Source_Mol"])]
+            mols = [Chem.MolFromSmiles(source_mol)]
             mol_gen = Chem.MolFromSmiles(str(row["Predicted_smi_" + str(j)]))
             if mol_gen is not None:
                 mols.append(mol_gen)

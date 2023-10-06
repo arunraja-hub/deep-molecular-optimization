@@ -50,6 +50,7 @@ class EvaluationRunner:
             self.property_overview_stat()
 
         # Compute Tanimoto similarity
+        # index_1_sim = 
         self.compute_similarity()
 
         # Save to file
@@ -60,6 +61,7 @@ class EvaluationRunner:
         LOG.info("Drawing molecules")
         image = draw_molecules.get_plot_sample(self.data, nr_of_source_mol=50, range_evaluation=self.range_evaluation)
         image.save(os.path.join(self.output_path, 'draw_molecules.png'), format='png')
+        # img_1_sim.save(os.path.join(self.output_path, 'img_1_sim.png'), format='png')
 
     def property_stat(self):
         LOG.info("-----------------Looking at properties separately---------------------------")
@@ -168,7 +170,8 @@ class EvaluationRunner:
         results_not_none = [s for s in similarities if s]
         up.hist_box_list(results_not_none, name="similarity",
                     path=self.output_path, title="Similarity")
-
+        df = pd.Series(results_not_none)
+        return df.nlargest(50).index
 
     def class_prop_stat(self, property_name):
         threshold = cfgd.PROPERTY_THRESHOLD[property_name]
